@@ -239,7 +239,7 @@ fixtures = [
     {"dt": "Custom Field", "filters": [["module", "=", "Tarqeem"]]},
     {"dt": "Custom Field", "filters": [["module", "=", "Sabaa"]]},
 	{"dt": "Code System", "filters": [["name", "=", "ICD10"]]},
-	# {"dt": "Code Value", "filters": [["code_system", "=", "ICD10"]]},
+	{"dt": "Code Value", "filters": [["code_system", "=", "ICD10"]]},
 	{"dt": "UOM"},
 	{"dt": "Item"},
 	{"dt": "Website Settings"},
