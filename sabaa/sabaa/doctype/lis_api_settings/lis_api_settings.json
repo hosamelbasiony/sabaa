@@ -1,0 +1,82 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2022-11-26 04:58:53.625297",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "base_url",
+  "bearer_token",
+  "limits_tab",
+  "daily_upload_percent",
+  "margin_percent",
+  "general_tab",
+  "default_currency"
+ ],
+ "fields": [
+  {
+   "default": "https://demo.yaseer-lis.net/api3",
+   "fieldname": "base_url",
+   "fieldtype": "Data",
+   "label": "Base Url"
+  },
+  {
+   "fieldname": "bearer_token",
+   "fieldtype": "Long Text",
+   "label": "Bearer Token"
+  },
+  {
+   "default": "0",
+   "fieldname": "daily_upload_percent",
+   "fieldtype": "Float",
+   "label": "Daily Upload Percent"
+  },
+  {
+   "default": "0",
+   "fieldname": "margin_percent",
+   "fieldtype": "Float",
+   "label": "Margin Percent"
+  },
+  {
+   "fieldname": "limits_tab",
+   "fieldtype": "Tab Break",
+   "label": "Limits"
+  },
+  {
+   "default": "EGP",
+   "fieldname": "default_currency",
+   "fieldtype": "Data",
+   "label": "Default Currency"
+  },
+  {
+   "fieldname": "general_tab",
+   "fieldtype": "Tab Break",
+   "label": "General"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "issingle": 1,
+ "links": [],
+ "modified": "2023-01-17 21:22:00.231070",
+ "modified_by": "Administrator",
+ "module": "Sabaa",
+ "name": "LIS API Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

@@ -6,11 +6,14 @@ app_email = "hosam@home.com"
 app_license = "mit"
 # required_apps = []
 
+app_logo_url = "/assets/sabaa/images/sabaa.svg"
+
 # Includes in <head>
 # ------------------
 
 # include js, css files in header of desk.html
 # app_include_css = "/assets/sabaa/css/sabaa.css"
+app_include_css = "/assets/sabaa/css/sabaa.css"
 # app_include_js = "/assets/sabaa/js/sabaa.js"
 
 # include js, css files in header of web template
@@ -40,6 +43,11 @@ app_license = "mit"
 
 # Home Pages
 # ----------
+
+website_context = {
+	"favicon": "/assets/sabaa/images/sabaa-fav.svg",
+	"splash_image": "/assets/sabaa/images/sabaa-splash.svg",
+}
 
 # application home page (will override Website Settings)
 # home_page = "login"
@@ -117,6 +125,12 @@ app_license = "mit"
 # override_doctype_class = {
 #	"ToDo": "custom_app.overrides.CustomToDo"
 # }
+
+override_doctype_class = {
+	"Bank": "sabaa.overrides.bank.MyBank",
+    "Patient": "sabaa.overrides.patient.MyPatient",
+    "InpatientRecord": "sabaa.overrides.inpatient_record.InpatientRecord",
+}
 
 # Document Events
 # ---------------
@@ -219,6 +233,20 @@ app_license = "mit"
 # auth_hooks = [
 #	"sabaa.auth.validate"
 # ]
+
+fixtures = [
+	# "tarqeem.auth.validate"
+    {"dt": "Custom Field", "filters": [["module", "=", "Tarqeem"]]},
+    {"dt": "Custom Field", "filters": [["module", "=", "Sabaa"]]},
+	{"dt": "Code System", "filters": [["name", "=", "ICD10"]]},
+	# {"dt": "Code Value", "filters": [["code_system", "=", "ICD10"]]},
+	{"dt": "UOM"},
+	{"dt": "Item"},
+	{"dt": "Website Settings"},
+	{"dt": "Medical Department"},
+	{"dt": "Healthcare Practitioner"},
+	# bench export-fixtures
+]
 
 # Automatically update python controller files with type annotations for this app.
 # export_python_type_annotations = True

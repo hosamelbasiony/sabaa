@@ -1,0 +1,152 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2022-11-25 20:30:19.062650",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "apiauthurl",
+  "apibaseurl",
+  "baseurl",
+  "column_break_4",
+  "version",
+  "clientid",
+  "clientsecret",
+  "tax_payer_data_tab",
+  "legal_name",
+  "branch_id",
+  "country",
+  "governate",
+  "region_city",
+  "column_break_13",
+  "business_type",
+  "tax_id",
+  "activity_code",
+  "api_version"
+ ],
+ "fields": [
+  {
+   "fieldname": "clientid",
+   "fieldtype": "Data",
+   "label": "clientId"
+  },
+  {
+   "fieldname": "clientsecret",
+   "fieldtype": "Data",
+   "label": "clientSecret"
+  },
+  {
+   "default": "https://api.preprod.invoicing.eta.gov.eg",
+   "fieldname": "apibaseurl",
+   "fieldtype": "Data",
+   "label": "apiBaseUrl"
+  },
+  {
+   "default": "1.0",
+   "fieldname": "version",
+   "fieldtype": "Data",
+   "label": "version"
+  },
+  {
+   "fieldname": "column_break_4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "https://id.preprod.eta.gov.eg/connect/token",
+   "fieldname": "apiauthurl",
+   "fieldtype": "Data",
+   "label": "apiAuthUrl"
+  },
+  {
+   "default": "https://preprod.invoicing.eta.gov.eg",
+   "fieldname": "baseurl",
+   "fieldtype": "Data",
+   "label": "baseUrl"
+  },
+  {
+   "fieldname": "tax_payer_data_tab",
+   "fieldtype": "Tab Break",
+   "label": "Tax Payer Data"
+  },
+  {
+   "default": "0",
+   "fieldname": "branch_id",
+   "fieldtype": "Data",
+   "label": "Branch Id"
+  },
+  {
+   "default": "EG",
+   "fieldname": "country",
+   "fieldtype": "Data",
+   "label": "Country"
+  },
+  {
+   "default": "\u0627\u0644\u0627\u0633\u0645\u0627\u0639\u064a\u0644\u064a\u0647",
+   "fieldname": "governate",
+   "fieldtype": "Data",
+   "label": "Governate"
+  },
+  {
+   "default": "\u0627\u0644\u0627\u0633\u0645\u0627\u0639\u064a\u0644\u064a\u0647",
+   "fieldname": "region_city",
+   "fieldtype": "Data",
+   "label": "Region City"
+  },
+  {
+   "fieldname": "column_break_13",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "B",
+   "fieldname": "business_type",
+   "fieldtype": "Data",
+   "label": "Business Type"
+  },
+  {
+   "fieldname": "tax_id",
+   "fieldtype": "Data",
+   "label": "Tax Id"
+  },
+  {
+   "fieldname": "legal_name",
+   "fieldtype": "Data",
+   "label": "Legal Name"
+  },
+  {
+   "fieldname": "activity_code",
+   "fieldtype": "Data",
+   "label": "Activity Code"
+  },
+  {
+   "default": "0.9",
+   "fieldname": "api_version",
+   "fieldtype": "Data",
+   "label": "API Version"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "issingle": 1,
+ "links": [],
+ "modified": "2022-12-17 05:00:33.615902",
+ "modified_by": "Administrator",
+ "module": "Sabaa",
+ "name": "E-Tax Portal Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
