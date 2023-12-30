@@ -383,7 +383,7 @@
     "deferred_expense_account": null,
     "deferred_revenue_account": null,
     "expense_account": null,
-    "income_account": null,
+    "income_account": "Sales - SH",
     "parent": "ECG",
     "parentfield": "item_defaults",
     "parenttype": "Item",

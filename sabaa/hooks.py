@@ -130,19 +130,19 @@ override_doctype_class = {
 	"Bank": "sabaa.overrides.bank.MyBank",
     "Patient": "sabaa.overrides.patient.MyPatient",
     "InpatientRecord": "sabaa.overrides.inpatient_record.InpatientRecord",
+    "Sales Invoice": "sabaa.sabaa.custom_doctype.sales_invoice.HealthcareSalesInvoice",
 }
 
 # Document Events
 # ---------------
 # Hook on document methods and events
 
-# doc_events = {
-#	"*": {
-#		"on_update": "method",
-#		"on_cancel": "method",
-#		"on_trash": "method"
-#	}
-# }
+doc_events = {
+	"Sales Invoice": {
+		"on_submit": "sabaa.sabaa.utils.manage_invoice_submit_cancel",
+		"on_cancel": "sabaa.sabaa.utils.manage_invoice_submit_cancel",
+	}
+}
 
 # Scheduled Tasks
 # ---------------
@@ -239,13 +239,14 @@ fixtures = [
     {"dt": "Custom Field", "filters": [["module", "=", "Tarqeem"]]},
     {"dt": "Custom Field", "filters": [["module", "=", "Sabaa"]]},
 	{"dt": "Code System", "filters": [["name", "=", "ICD10"]]},
-	{"dt": "Code Value", "filters": [["code_system", "=", "ICD10"]]},
-	{"dt": "UOM"},
+	# {"dt": "Code Value", "filters": [["code_system", "=", "ICD10"]]},
+	{"dt": "UOM", "filters": [["custom_is_custom", "=", True]]},
 	{"dt": "Item"},
 	{"dt": "Website Settings"},
-	{"dt": "Medical Department"},
+	{"dt": "Medical Department", "filters": [["custom_is_custom", "=", True]]},
 	{"dt": "Healthcare Practitioner"},
 	# bench export-fixtures
+    # bench --site dcode.com migrate --skip-failing
 ]
 
 # Automatically update python controller files with type annotations for this app.
