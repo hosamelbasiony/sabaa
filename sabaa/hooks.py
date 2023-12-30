@@ -14,6 +14,7 @@ app_logo_url = "/assets/sabaa/images/sabaa.svg"
 # include js, css files in header of desk.html
 # app_include_css = "/assets/sabaa/css/sabaa.css"
 app_include_css = "/assets/sabaa/css/sabaa.css"
+# app_include_js = "/assets/sabaa/js/sabaa.bundle.js"
 # app_include_js = "/assets/sabaa/js/sabaa.js"
 
 # include js, css files in header of web template
@@ -127,10 +128,12 @@ website_context = {
 # }
 
 override_doctype_class = {
+	# "SalesInvoiceController": "sabaa.overrides.taxes_and_totals.my_calculate_taxes_and_totals",
 	"Bank": "sabaa.overrides.bank.MyBank",
     "Patient": "sabaa.overrides.patient.MyPatient",
     "InpatientRecord": "sabaa.overrides.inpatient_record.InpatientRecord",
-    "Sales Invoice": "sabaa.sabaa.custom_doctype.sales_invoice.HealthcareSalesInvoice",
+    "Sales Invoice": "sabaa.sabaa.custom_doctype.sales_invoice.SabaaHealthcareSalesInvoice",    
+	"erpnext.accounts.SalesInvoiceController": "sabaa.overrides.taxes_and_totals"
 }
 
 # Document Events
