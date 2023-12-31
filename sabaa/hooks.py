@@ -243,13 +243,19 @@ fixtures = [
     {"dt": "Custom Field", "filters": [["module", "=", "Tarqeem"]]},
     {"dt": "Custom Field", "filters": [["module", "=", "Sabaa"]]},
 	{"dt": "Code System", "filters": [["name", "=", "ICD10"]]},
-	{"dt": "Code Value", "filters": [["code_system", "=", "ICD10"]]},
+	# {"dt": "Code Value", "filters": [["code_system", "=", "ICD10"]]},
 	{"dt": "UOM", "filters": [["custom_is_custom", "=", True]]},
 	{"dt": "Item"},
 	{"dt": "Website Settings"},
 	{"dt": "Medical Department", "filters": [["custom_is_custom", "=", True]]},
 	{"dt": "Healthcare Practitioner"},
     {"dt": "Property Setter", "filters": [["module", "=", "Sabaa"]]},
+    {"dt": "Patient"},
+    {"dt": "Insurance Payor"},
+    {"dt": "Insurance Payor Contract"},
+ 	# {"dt": "Insurance Payor Eligibility"},
+    # {"dt": "Insurance Payor Eligibility Plan"},
+    # {"dt": "Patient Insurance Policy"},
 	# bench export-fixtures
     # bench --site dcode.com migrate --skip-failing
 ]
