@@ -4,7 +4,7 @@
  "allow_import": 1,
  "allow_rename": 1,
  "autoname": "field:insurance_payor_name",
- "beta": 1,
+ "beta": 0,
  "description": "Insurance Payor",
  "doctype": "DocType",
  "document_type": "Document",

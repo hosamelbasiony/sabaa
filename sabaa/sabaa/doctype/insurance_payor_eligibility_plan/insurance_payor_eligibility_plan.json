@@ -3,7 +3,7 @@
  "allow_import": 1,
  "allow_rename": 1,
  "autoname": "field:insurance_plan_name",
- "beta": 1,
+ "beta": 0,
  "creation": "2020-10-16 09:54:50.763071",
  "description": "Healthcare Insurance Plan",
  "doctype": "DocType",

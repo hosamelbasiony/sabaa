@@ -251,6 +251,7 @@ fixtures = [
 	{"dt": "Healthcare Practitioner"},
     {"dt": "Property Setter", "filters": [["module", "=", "Sabaa"]]},
     {"dt": "Account", "filters": [["name", "=", "Insurance - SH"]]},
+    {"dt": "Customer Group", "filters": [["name", "=", "Insurance Payor"]]},
     {"dt": "Customer"},
     {"dt": "Patient"},
     {"dt": "Insurance Payor"},

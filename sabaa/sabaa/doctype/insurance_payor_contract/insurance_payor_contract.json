@@ -5,7 +5,7 @@
  "allow_import": 1,
  "allow_rename": 1,
  "autoname": "naming_series:",
- "beta": 1,
+ "beta": 0,
  "creation": "2020-10-16 09:41:32.043333",
  "description": "Insurance Payor Contract",
  "doctype": "DocType",
