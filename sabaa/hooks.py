@@ -33,6 +33,7 @@ app_include_css = "/assets/sabaa/css/sabaa.css"
 
 # include js in doctype views
 # doctype_js = {"doctype" : "public/js/doctype.js"}
+doctype_js = {"Sales Invoice": "public/js/sales_invoice.js"}
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
@@ -130,7 +131,7 @@ website_context = {
 override_doctype_class = {
 	# "SalesInvoiceController": "sabaa.overrides.taxes_and_totals.my_calculate_taxes_and_totals",
 	"Bank": "sabaa.overrides.bank.MyBank",
-    "Patient": "sabaa.overrides.patient.MyPatient",
+    # "Patient": "sabaa.overrides.patient.MyPatient",
     "InpatientRecord": "sabaa.overrides.inpatient_record.InpatientRecord",
     "Sales Invoice": "sabaa.sabaa.custom_doctype.sales_invoice.SabaaHealthcareSalesInvoice",    
 	"erpnext.accounts.SalesInvoiceController": "sabaa.overrides.taxes_and_totals"
@@ -242,12 +243,13 @@ fixtures = [
     {"dt": "Custom Field", "filters": [["module", "=", "Tarqeem"]]},
     {"dt": "Custom Field", "filters": [["module", "=", "Sabaa"]]},
 	{"dt": "Code System", "filters": [["name", "=", "ICD10"]]},
-	# {"dt": "Code Value", "filters": [["code_system", "=", "ICD10"]]},
+	{"dt": "Code Value", "filters": [["code_system", "=", "ICD10"]]},
 	{"dt": "UOM", "filters": [["custom_is_custom", "=", True]]},
 	{"dt": "Item"},
 	{"dt": "Website Settings"},
 	{"dt": "Medical Department", "filters": [["custom_is_custom", "=", True]]},
 	{"dt": "Healthcare Practitioner"},
+    {"dt": "Property Setter", "filters": [["module", "=", "Sabaa"]]},
 	# bench export-fixtures
     # bench --site dcode.com migrate --skip-failing
 ]

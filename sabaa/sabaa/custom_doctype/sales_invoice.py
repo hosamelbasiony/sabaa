@@ -4,22 +4,6 @@ from erpnext.accounts.doctype.sales_invoice.sales_invoice import SalesInvoice
 from frappe.utils import flt
 
 class SabaaHealthcareSalesInvoice(SalesInvoice):
-	
-	def set_status(self):
-		super(SabaaHealthcareSalesInvoice, self).set_status()		
-		# self.calculate_patient_insurance_coverage()
-
-		print("🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀")
-		print("🚀🚀🚀🚀🚀🚀🚀 " + self.patient + " 🚀🚀🚀🚀🚀🚀")		
-		total_insurance_coverage_amount = 100
-		if total_insurance_coverage_amount:
-			self.patient_payable_amount = self.outstanding_amount - total_insurance_coverage_amount
-		else:
-			self.custom_patient_payable_amount = self.outstanding_amount
-		
-		self.outstanding_amount -= 100
-		print(self.outstanding_amount)
-		print("🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀")
 
 	
 	@frappe.whitelist()
@@ -77,29 +61,81 @@ class SabaaHealthcareSalesInvoice(SalesInvoice):
 		self.calculate_patient_insurance_coverage()
 
 	def calculate_patient_insurance_coverage(self):
+		total_amount_to_pay = 0.0
 		total_coverage_amount = 0.0
-		
-		for item in self.items:
-			if True or (item.amount and item.custom_insurance_coverage):
-				item.custom_insurance_coverage = 45
-				item.custom_insurance_coverage_amount = flt(item.amount) * 0.01 * flt(item.custom_insurance_coverage)
 
-			if item.custom_insurance_coverage_amount and flt(item.custom_insurance_coverage_amount) > 0:
-				total_coverage_amount += flt(item.custom_insurance_coverage_amount)
+		patient_policies = frappe.get_list(
+			'Patient Insurance Policy',
+			fields = '*',
+			filters = {'patient': self.patient} #, 'active': True}
+		)
 
-			frappe.msgprint(
-				msg="total_coverage_amount: " + str(total_coverage_amount),
-				title='GOOT; FERY GOOT'
-			)
+		if len(patient_policies):
 
-		self.custom_patient_payable_amount = 5789
+			patient_policy = patient_policies[0]
 
-		self.custom_total_insurance_coverage_amount = total_coverage_amount
-		if self.custom_total_insurance_coverage_amount:
-			self.custom_patient_payable_amount = self.outstanding_amount - self.custom_total_insurance_coverage_amount
-		else:
-			self.custom_patient_payable_amount = self.outstanding_amount
-		
+			insurance_plan = frappe.get_list(
+				'Insurance Payor Eligibility Plan',
+				fields = '*',
+				filters = [
+						{'name': patient_policy["insurance_plan"]},
+						# {'item_code': item.item_code}
+					]
+				)
+
+			eligibility_list = frappe.get_list(
+					'Item Insurance Eligibility',
+					fields = '*',
+					filters = [
+						{'insurance_plan': patient_policy["insurance_plan"]},
+						# {'item_code': item.item_code}
+					]
+				)
+			
+			price_list_name = insurance_plan[0]["price_list"]
+			price_list = frappe.get_list(
+					'Item Price',
+					fields = '*',
+					filters = [
+						{'price_list':  "تأمين 1"}
+					]
+				)
+			print(price_list)
+			
+			for item in self.items:				
+				for x in price_list:
+					if x.item_code == item.item_code:
+						item.rate = x.price_list_rate
+						item.amount = x.price_list_rate
+						# pass
+
+				for x in eligibility_list:
+					if x.item_code == item.item_code:
+						if x.coverage != 0 and item.amount:
+							item.custom_insurance_coverage = flt(x.coverage)
+							item.custom_insurance_coverage_amount = flt(item.amount) * 0.01 * flt(item.custom_insurance_coverage)
+
+						if item.custom_insurance_coverage_amount and flt(item.custom_insurance_coverage_amount) > 0:
+							total_coverage_amount += flt(item.custom_insurance_coverage_amount)
+
+						# frappe.msgprint(
+						# 	msg="total_coverage_amount: " + item.item_code + " coverage: " + str(item.custom_insurance_coverage_amount),
+						# 	title='GOOT; FERY GOOT'
+						# )
+						# break
+				total_amount_to_pay += item.rate
+
+			self.custom_total_insurance_coverage_amount = total_coverage_amount
+
+			super(SalesInvoice, self).calculate_taxes_and_totals()
+			
+			if self.custom_total_insurance_coverage_amount:
+				self.custom_patient_payable_amount = self.outstanding_amount - self.custom_total_insurance_coverage_amount
+			else:
+				self.custom_patient_payable_amount = self.outstanding_amount
+
+			
+			
 
 # Patient Payable
 # import frappe
