@@ -250,6 +250,7 @@ fixtures = [
 	{"dt": "Medical Department", "filters": [["custom_is_custom", "=", True]]},
 	{"dt": "Healthcare Practitioner"},
     {"dt": "Property Setter", "filters": [["module", "=", "Sabaa"]]},
+    {"dt": "Customer"},
     {"dt": "Patient"},
     {"dt": "Insurance Payor"},
     {"dt": "Insurance Payor Contract"},
@@ -258,6 +259,7 @@ fixtures = [
     # {"dt": "Patient Insurance Policy"},
 	# bench export-fixtures
     # bench --site dcode.com migrate --skip-failing
+    # bench --site sabaa.tarqim.info migrate
 ]
 
 # Automatically update python controller files with type annotations for this app.
