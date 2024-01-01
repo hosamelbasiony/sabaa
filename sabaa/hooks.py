@@ -131,12 +131,7 @@ website_context = {
 # }
 
 override_doctype_class = {
-	# "SalesInvoiceController": "sabaa.overrides.taxes_and_totals.my_calculate_taxes_and_totals",
-	"Bank": "sabaa.overrides.bank.MyBank",
-    # "Patient": "sabaa.overrides.patient.MyPatient",
-    "InpatientRecord": "sabaa.overrides.inpatient_record.InpatientRecord",
-    "Sales Invoice": "sabaa.sabaa.custom_doctype.sales_invoice.SabaaHealthcareSalesInvoice",    
-	"erpnext.accounts.SalesInvoiceController": "sabaa.overrides.taxes_and_totals"
+    # "Sales Invoice": "sabaa.sabaa.custom_doctype.sales_invoice.SabaaHealthcareSalesInvoice",
 }
 
 # Document Events
@@ -182,6 +177,11 @@ override_doctype_class = {
 # override_whitelisted_methods = {
 #	"frappe.desk.doctype.event.event.get_events": "sabaa.event.get_events"
 # }
+
+override_whitelisted_methods = {
+	"healthcare.healthcare.utils.get_healthcare_services_to_invoice": "sabaa.sabaa.utils.get_healthcare_services_to_invoice"
+}
+
 #
 # each overriding function accepts a `data` argument;
 # generated from the base implementation of the doctype dashboard,
