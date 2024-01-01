@@ -72,55 +72,53 @@ class SabaaHealthcareSalesInvoice(SalesInvoice):
 
 		if len(patient_policies):
 
-			pass
-
-			# patient_policy = patient_policies[0]
+			patient_policy = patient_policies[0]
 
 
-			# eligibility_list = frappe.get_list(
-			# 		'Item Insurance Eligibility',
-			# 		fields = '*',
-			# 		filters = [
-			# 			{'insurance_plan': patient_policy["insurance_plan"]},
-			# 			# {'item_code': item.item_code}
-			# 		]
-			# 	)
+			eligibility_list = frappe.get_list(
+					'Item Insurance Eligibility',
+					fields = '*',
+					filters = [
+						{'insurance_plan': patient_policy["insurance_plan"]},
+						# {'item_code': item.item_code}
+					]
+				)
 			
-			# price_list = frappe.get_list(
-			# 		'Item Price',
-			# 		fields = '*',
-			# 		filters = [
-			# 			{'price_list':  "تأمين 1"}
-			# 		]
-			# 	)
-			# print(price_list)
+			price_list = frappe.get_list(
+					'Item Price',
+					fields = '*',
+					filters = [
+						{'price_list':  "تأمين 1"}
+					]
+				)
+			print(price_list)
 			
-			# for item in self.items:				
-			# 	for x in price_list:
-			# 		if x.item_code == item.item_code:
-			# 			item.rate = x.price_list_rate
-			# 			item.amount = x.price_list_rate
-			# 			# pass
+			for item in self.items:				
+				for x in price_list:
+					if x.item_code == item.item_code:
+						item.rate = x.price_list_rate
+						item.amount = x.price_list_rate
+						# pass
 
-			# 	for x in eligibility_list:
-			# 		if x.item_code == item.item_code:
-			# 			if x.coverage != 0 and item.amount:
-			# 				item.custom_insurance_coverage = flt(x.coverage)
-			# 				item.custom_insurance_coverage_amount = flt(item.amount) * 0.01 * flt(item.custom_insurance_coverage)
+				for x in eligibility_list:
+					if x.item_code == item.item_code:
+						if x.coverage != 0 and item.amount:
+							item.custom_insurance_coverage = flt(x.coverage)
+							item.custom_insurance_coverage_amount = flt(item.amount) * 0.01 * flt(item.custom_insurance_coverage)
 
-			# 			if item.custom_insurance_coverage_amount and flt(item.custom_insurance_coverage_amount) > 0:
-			# 				total_coverage_amount += flt(item.custom_insurance_coverage_amount)
+						if item.custom_insurance_coverage_amount and flt(item.custom_insurance_coverage_amount) > 0:
+							total_coverage_amount += flt(item.custom_insurance_coverage_amount)
 
-			# 	total_amount_to_pay += item.rate
+				total_amount_to_pay += item.rate
 
-			# self.custom_total_insurance_coverage_amount = total_coverage_amount
+			self.custom_total_insurance_coverage_amount = total_coverage_amount
 
-			# super(SalesInvoice, self).calculate_taxes_and_totals()
+			super(SalesInvoice, self).calculate_taxes_and_totals()
 			
-			# if self.custom_total_insurance_coverage_amount:
-			# 	self.custom_patient_payable_amount = self.outstanding_amount - self.custom_total_insurance_coverage_amount
-			# else:
-			# 	self.custom_patient_payable_amount = self.outstanding_amount
+			if self.custom_total_insurance_coverage_amount:
+				self.custom_patient_payable_amount = self.outstanding_amount - self.custom_total_insurance_coverage_amount
+			else:
+				self.custom_patient_payable_amount = self.outstanding_amount
 
 			
 			
