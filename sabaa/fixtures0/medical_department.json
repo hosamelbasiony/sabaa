@@ -1,0 +1,20 @@
+[
+ {
+  "custom_is_custom": 1,
+  "department": "ICU",
+  "docstatus": 0,
+  "doctype": "Medical Department",
+  "modified": "2023-12-30 04:27:55.417590",
+  "name": "ICU",
+  "patient_care_type": "Intervention"
+ },
+ {
+  "custom_is_custom": 1,
+  "department": "Paediatrics",
+  "docstatus": 0,
+  "doctype": "Medical Department",
+  "modified": "2023-12-30 04:27:52.746650",
+  "name": "Paediatrics",
+  "patient_care_type": ""
+ }
+]
