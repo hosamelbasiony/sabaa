@@ -141,12 +141,12 @@ override_doctype_class = {
 # ---------------
 # Hook on document methods and events
 
-doc_events = {
-	"Sales Invoice": {
-		"on_submit": "sabaa.sabaa.utils.manage_invoice_submit_cancel",
-		"on_cancel": "sabaa.sabaa.utils.manage_invoice_submit_cancel",
-	}
-}
+# doc_events = {
+# 	"Sales Invoice": {
+# 		"on_submit": "sabaa.sabaa.utils.manage_invoice_submit_cancel",
+# 		"on_cancel": "sabaa.sabaa.utils.manage_invoice_submit_cancel",
+# 	}
+# }
 
 # Scheduled Tasks
 # ---------------

@@ -657,8 +657,8 @@ def set_invoiced(item, method, ref_invoice=None):
 			frappe.db.set_value(item.reference_dt, item.reference_dn, "consumption_invoiced", invoiced)
 		else:
 			frappe.db.set_value(item.reference_dt, item.reference_dn, "invoiced", invoiced)
-	# else:
-	# 	frappe.db.set_value(item.reference_dt, item.reference_dn, "invoiced", invoiced)
+	else:
+		frappe.db.set_value(item.reference_dt, item.reference_dn, "invoiced", invoiced)
 
 	if item.reference_dt == "Patient Appointment":
 		if frappe.db.get_value("Patient Appointment", item.reference_dn, "procedure_template"):
@@ -713,7 +713,21 @@ def validate_invoiced_on_submit(item):
 
 	else:
 		is_invoiced = frappe.db.get_value(item.reference_dt, item.reference_dn, "invoiced")
+
 	if is_invoiced:
+
+		invoiced = frappe.get_list(
+			item.reference_dt,
+			fields=["*"],
+			filters={
+				"name": item.reference_dn
+			},
+		)
+		print("🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠")
+		print("######### Getting invoiced status in sabaa ##############")
+		print(invoiced)
+		print("🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠")
+
 		frappe.throw(
 			_("The item referenced by {0} - {1} is already invoiced").format(
 				item.reference_dt, item.reference_dn
