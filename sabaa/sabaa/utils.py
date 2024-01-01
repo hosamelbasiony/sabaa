@@ -25,8 +25,6 @@ from healthcare.healthcare.doctype.observation_template.observation_template imp
 from healthcare.setup import setup_healthcare
 
 # START MY CODE
-# 🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠
-
 def get_min_qnty(service_unit_type):
 
 	inpatient_services = frappe.db.sql(
@@ -50,16 +48,12 @@ def get_min_qnty(service_unit_type):
 	if len(inpatient_services):
 		return inpatient_services[0]['custom_minimal_quantity']
 	else: return 0.50
-
-# 🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠
 # END MY CODE
 
 @frappe.whitelist()
 def get_healthcare_services_to_invoice(patient, company):
 
-	print("🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠")
-	print("🏠🏠🏠🏠🏠 HEALTHCARE UTILS OVERRIDE 🏠🏠🏠🏠🏠🏠🏠")
-	print("🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠")
+	print("🏠🏠🏠🏠🏠 HEALTHCARE UTILS  SABAA OVERRIDE 🏠🏠🏠🏠🏠🏠🏠")
 	
 	patient = frappe.get_doc("Patient", patient)
 	items_to_invoice = []
@@ -301,7 +295,7 @@ def get_inpatient_services_to_invoice(patient, company):
 	)
 
 	for inpatient_occupancy in inpatient_services:
-		print(inpatient_occupancy)
+		print("inpatient_occupancy", inpatient_occupancy)
 		service_unit_type = frappe.db.get_value(
 			"Healthcare Service Unit", inpatient_occupancy.service_unit, "service_unit_type"
 		)
@@ -311,7 +305,9 @@ def get_inpatient_services_to_invoice(patient, company):
 				time_diff_in_hours(inpatient_occupancy.check_out, inpatient_occupancy.check_in), 2
 			)
 			qty = 0.5
+			
 			qty = get_min_qnty(service_unit_type)
+
 			if hours_occupied > 0:
 				actual_qty = hours_occupied / service_unit_type.no_of_hours
 				floor = math.floor(actual_qty)

@@ -1,13 +1,7 @@
 
 __version__ = '0.0.1'
 
-from erpnext.controllers.taxes_and_totals import calculate_taxes_and_totals
-from sabaa.custom_methods import custom_calculate_taxes_and_totals
+# from erpnext.controllers.taxes_and_totals import calculate_taxes_and_totals
+# from sabaa.taxes_and_totals import custom_calculate_taxes_and_totals
 
-calculate_taxes_and_totals.calculate_outstanding_amount = custom_calculate_taxes_and_totals.custom_calculate_outstanding_amount
-
-
-# from healthcare.healthcare.utils import get_inpatient_services_to_invoice
-# from sabaa.custom_methods import custom_get_inpatient_services_to_invoice
-
-# get_inpatient_services_to_invoice = custom_get_inpatient_services_to_invoice
+# calculate_taxes_and_totals.calculate_outstanding_amount = custom_calculate_taxes_and_totals.calculate_outstanding_amount

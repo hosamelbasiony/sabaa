@@ -7,13 +7,89 @@ app_license = "mit"
 # required_apps = []
 
 app_logo_url = "/assets/sabaa/images/sabaa.svg"
+app_include_css = "/assets/sabaa/css/sabaa.css"
+
+website_context = {
+	"favicon": "/assets/sabaa/images/sabaa-fav.svg",
+	"splash_image": "/assets/sabaa/images/sabaa-splash.svg",
+}
+
+doctype_js = {"Sales Invoice": "public/js/sales_invoice.js"}
+
+override_doctype_class = {
+    "Sales Invoice": "sabaa.sabaa.custom_doctype.sales_invoice.SabaaHealthcareSalesInvoice",
+}
+
+override_whitelisted_methods = {
+	"healthcare.healthcare.utils.get_healthcare_services_to_invoice": "sabaa.sabaa.utils.get_healthcare_services_to_invoice",
+	# "healthcare.healthcare.utils.get_healthcare_services_to_invoice": "sabaa.sabaa.utils.get_healthcare_services_to_invoice"
+}
+
+fixtures = [
+	# "tarqeem.auth.validate"
+    {"dt": "Custom Field", "filters": [["module", "=", "Tarqeem"]]},
+    {"dt": "Custom Field", "filters": [["module", "=", "Sabaa"]]},
+	{"dt": "Code System", "filters": [["name", "=", "ICD10"]]},
+	# {"dt": "Code Value", "filters": [["code_system", "=", "ICD10"]]},
+	{"dt": "UOM", "filters": [["custom_is_custom", "=", True]]},
+	{"dt": "Item"},
+	{"dt": "Website Settings"},
+	{"dt": "Medical Department", "filters": [["custom_is_custom", "=", True]]},
+	{"dt": "Healthcare Practitioner"},
+    {"dt": "Property Setter", "filters": [["module", "=", "Sabaa"]]},
+    {"dt": "Account", "filters": [["name", "=", "Insurance - SH"]]},
+    {"dt": "Customer Group", "filters": [["name", "=", "Insurance Payor"]]},
+    {"dt": "Customer"},
+    {"dt": "Patient"},
+    {"dt": "Insurance Payor"},
+    {"dt": "Insurance Payor Contract"},
+ 	# {"dt": "Insurance Payor Eligibility"},
+    # {"dt": "Insurance Payor Eligibility Plan"},
+    # {"dt": "Patient Insurance Policy"},
+	# bench export-fixtures
+    # bench --site dcode.com migrate --skip-failing
+    # bench --site sabaa.tarqim.info migrate
+]
+
+after_install = "sabaa.install.after_install"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Automatically update python controller files with type annotations for this app.
+# export_python_type_annotations = True
+
+# default_log_clearing_doctypes = {
+#	"Logging DocType Name": 30  # days to retain logs
+# }
+
+
 
 # Includes in <head>
 # ------------------
 
 # include js, css files in header of desk.html
 # app_include_css = "/assets/sabaa/css/sabaa.css"
-app_include_css = "/assets/sabaa/css/sabaa.css"
+
 # app_include_js = "/assets/sabaa/js/sabaa.bundle.js"
 # app_include_js = "/assets/sabaa/js/sabaa.js"
 
@@ -48,10 +124,7 @@ app_include_css = "/assets/sabaa/css/sabaa.css"
 # Home Pages
 # ----------
 
-website_context = {
-	"favicon": "/assets/sabaa/images/sabaa-fav.svg",
-	"splash_image": "/assets/sabaa/images/sabaa-splash.svg",
-}
+
 
 # application home page (will override Website Settings)
 # home_page = "login"
@@ -130,10 +203,6 @@ website_context = {
 #	"ToDo": "custom_app.overrides.CustomToDo"
 # }
 
-override_doctype_class = {
-    # "Sales Invoice": "sabaa.sabaa.custom_doctype.sales_invoice.SabaaHealthcareSalesInvoice",
-}
-
 # Document Events
 # ---------------
 # Hook on document methods and events
@@ -177,10 +246,6 @@ override_doctype_class = {
 # override_whitelisted_methods = {
 #	"frappe.desk.doctype.event.event.get_events": "sabaa.event.get_events"
 # }
-
-override_whitelisted_methods = {
-	"healthcare.healthcare.utils.get_healthcare_services_to_invoice": "sabaa.sabaa.utils.get_healthcare_services_to_invoice"
-}
 
 #
 # each overriding function accepts a `data` argument;
@@ -239,37 +304,3 @@ override_whitelisted_methods = {
 # auth_hooks = [
 #	"sabaa.auth.validate"
 # ]
-
-fixtures = [
-	# "tarqeem.auth.validate"
-    {"dt": "Custom Field", "filters": [["module", "=", "Tarqeem"]]},
-    {"dt": "Custom Field", "filters": [["module", "=", "Sabaa"]]},
-	{"dt": "Code System", "filters": [["name", "=", "ICD10"]]},
-	# {"dt": "Code Value", "filters": [["code_system", "=", "ICD10"]]},
-	{"dt": "UOM", "filters": [["custom_is_custom", "=", True]]},
-	{"dt": "Item"},
-	{"dt": "Website Settings"},
-	{"dt": "Medical Department", "filters": [["custom_is_custom", "=", True]]},
-	{"dt": "Healthcare Practitioner"},
-    {"dt": "Property Setter", "filters": [["module", "=", "Sabaa"]]},
-    {"dt": "Account", "filters": [["name", "=", "Insurance - SH"]]},
-    {"dt": "Customer Group", "filters": [["name", "=", "Insurance Payor"]]},
-    {"dt": "Customer"},
-    {"dt": "Patient"},
-    {"dt": "Insurance Payor"},
-    {"dt": "Insurance Payor Contract"},
- 	# {"dt": "Insurance Payor Eligibility"},
-    # {"dt": "Insurance Payor Eligibility Plan"},
-    # {"dt": "Patient Insurance Policy"},
-	# bench export-fixtures
-    # bench --site dcode.com migrate --skip-failing
-    # bench --site sabaa.tarqim.info migrate
-]
-
-# Automatically update python controller files with type annotations for this app.
-# export_python_type_annotations = True
-
-# default_log_clearing_doctypes = {
-#	"Logging DocType Name": 30  # days to retain logs
-# }
-

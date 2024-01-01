@@ -3,9 +3,14 @@
 
 
 import frappe
+import json
 from frappe.utils import flt
 from frappe.utils import cstr, flt, get_link_to_form, rounded, time_diff_in_hours
-import math
+from math import ceil
+
+def dump(obj):
+  for attr in dir(obj):
+    print("obj.%s = %r" % (attr, getattr(obj, attr)))
 
 def calculate_patient_insurance_coverage(selfie):
 	self = selfie.doc
@@ -20,8 +25,6 @@ def calculate_patient_insurance_coverage(selfie):
 		fields = '*',
 		# filters = {'patient': self.patient} 
 	)
-
-	print(patient_policies)
 
 	if len(patient_policies):
 
@@ -42,7 +45,8 @@ def calculate_patient_insurance_coverage(selfie):
 					{'price_list':  "تأمين 1"}
 				]
 			)
-		print(price_list)
+		
+		# print(price_list)
 		
 		for item in self.items:				
 			for x in price_list:
@@ -55,27 +59,32 @@ def calculate_patient_insurance_coverage(selfie):
 				if x.item_code == item.item_code:
 					if x.coverage != 0 and item.amount:
 						item.custom_insurance_coverage = flt(x.coverage)
-						item.custom_insurance_coverage_amount = flt(item.amount) * 0.01 * flt(item.custom_insurance_coverage)
+						item.custom_insurance_coverage_amount = flt(item.qty) * flt(item.amount) * 0.01 * flt(item.custom_insurance_coverage)
 
 					if item.custom_insurance_coverage_amount and flt(item.custom_insurance_coverage_amount) > 0:
 						total_coverage_amount += flt(item.custom_insurance_coverage_amount)
+						print("***************************")
+						print(item.qty)
+						print(item.amount)
 
-			total_amount_to_pay += item.rate
+			total_amount_to_pay += flt(item.qty) * flt(item.amount)
+		    # ceil()
 
-		self.custom_total_insurance_coverage_amount = total_coverage_amount
+		self.custom_total_insurance_coverage_amount = ceil(total_coverage_amount)
 
-		# super(SalesInvoice, self).calculate_taxes_and_totals()
-		
+		# self.custom_patient_payable_amount = 111
+
+		frappe.msgprint(str(self.custom_total_insurance_coverage_amount))
+
 		if self.custom_total_insurance_coverage_amount:
 			self.custom_patient_payable_amount = self.outstanding_amount - self.custom_total_insurance_coverage_amount
 		else:
 			self.custom_patient_payable_amount = self.outstanding_amount
 
 
-class custom_calculate_taxes_and_totals(object):
-	
+class custom_calculate_taxes_and_totals(object):	
 
-	def custom_calculate_outstanding_amount(self):
+	def calculate_outstanding_amount(self):
 		frappe.msgprint("HERE HERE HERE HERE HERE HERE HERE HERE")
 		# NOTE:
 		# write_off_amount is only for POS Invoice
@@ -155,11 +164,9 @@ class custom_calculate_taxes_and_totals(object):
 				self.set_total_amount_to_default_mop(total_amount_to_pay)
 				self.calculate_paid_amount()
 
-		print("🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠")
-		print("🏠🏠🏠🏠🏠 calculate patient and insurance fees  🏠🏠🏠🏠🏠🏠🏠")
-		print("🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠")
+		print("🏠🏠🏠🏠🏠 calculate patient and insurance fees in sabaa taxes and totals  🏠🏠🏠🏠🏠🏠🏠")
 		
-		# calculate_patient_insurance_coverage(self)
+		calculate_patient_insurance_coverage(self)
 
 	
 	

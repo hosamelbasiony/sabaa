@@ -1,24 +1,29 @@
 // Healthcare
-
-frappe.ui.form.on("Quotation", "outstanding_amount", function(frm) {
-	// frm.set_value("deposit_required", frm.doc.grand_total * 0.6);
-	alert("jjjjjj")		
-});
-
 frappe.ui.form.on('Sales Invoice', {
 	refresh(frm) {
 		if (frm.doc.docstatus === 0 && !frm.doc.is_return) {
-			frm.add_custom_button(__('Healthcare Services'), function () {
+			frm.add_custom_button(__('Healthcare Services'), function() {
 				get_healthcare_services_to_invoice(frm);
-			}, __('Get Items From'));
-			frm.add_custom_button(__('Prescriptions'), function () {
+			},__('Get Items From'));
+			frm.add_custom_button(__('Prescriptions'), function() {
 				get_drugs_to_invoice(frm);
-			}, __('Get Items From'));
-		}
-	},
+			},__('Get Items From'));
 
-	outstanding_amount(frm) {
-		alert(frm.doc.outstanding_amount)		
+
+			
+			frm.add_custom_button(__('Show Insurance Coverage'), function() {
+				alert()
+			},__('Insurance'));
+
+
+			frm.add_custom_button(__('Show Insurance Coverage'), function() {
+				alert()
+			},__('Insurance'));
+
+			frm.add_custom_button(__('Apply Insurance Coverage'), function() {
+				alert('Apply Insurance Coverage')
+			},__('Insurance'));
+		}
 	},
 
 	patient(frm) {
@@ -50,8 +55,7 @@ frappe.ui.form.on('Sales Invoice', {
 
 	items_add: function (frm) {
 		set_service_unit(frm);
-		alert(frm.doc.outstanding_amount);
-	},
+	}
 });
 
 var set_service_unit = function (frm) {
@@ -64,12 +68,12 @@ var set_service_unit = function (frm) {
 	}
 };
 
-var get_healthcare_services_to_invoice = function (frm) {
+var get_healthcare_services_to_invoice = function(frm) {
 	var me = this;
 	let selected_patient = '';
 	var dialog = new frappe.ui.Dialog({
 		title: __("Get Items from Healthcare Services"),
-		fields: [
+		fields:[
 			{
 				fieldtype: 'Link',
 				options: 'Patient',
@@ -77,7 +81,7 @@ var get_healthcare_services_to_invoice = function (frm) {
 				fieldname: "patient",
 				reqd: true
 			},
-			{ fieldtype: 'Section Break' },
+			{ fieldtype: 'Section Break'	},
 			{ fieldtype: 'HTML', fieldname: 'results_area' }
 		]
 	});
@@ -89,14 +93,14 @@ var get_healthcare_services_to_invoice = function (frm) {
 	});
 	dialog.fields_dict["patient"].df.onchange = () => {
 		var patient = dialog.fields_dict.patient.input.value;
-		if (patient && patient != selected_patient) {
+		if(patient && patient!=selected_patient){
 			selected_patient = patient;
 			var method = "healthcare.healthcare.utils.get_healthcare_services_to_invoice";
-			var args = { patient: patient, company: frm.doc.company };
+			var args = {patient: patient, company: frm.doc.company};
 			var columns = (["service", "reference_name", "reference_type"]);
 			get_healthcare_items(frm, true, $results, $placeholder, method, args, columns);
 		}
-		else if (!patient) {
+		else if(!patient){
 			selected_patient = '';
 			$results.empty();
 			$results.append($placeholder);
@@ -119,16 +123,16 @@ var get_healthcare_services_to_invoice = function (frm) {
 	dialog.show();
 };
 
-var get_healthcare_items = function (frm, invoice_healthcare_services, $results, $placeholder, method, args, columns) {
+var get_healthcare_items = function(frm, invoice_healthcare_services, $results, $placeholder, method, args, columns) {
 	var me = this;
 	$results.empty();
 	frappe.call({
 		method: method,
 		args: args,
-		callback: function (data) {
-			if (data.message) {
+		callback: function(data) {
+			if(data.message){
 				$results.append(make_list_row(columns, invoice_healthcare_services));
-				for (let i = 0; i < data.message.length; i++) {
+				for(let i=0; i<data.message.length; i++){
 					$results.append(make_list_row(columns, invoice_healthcare_services, data.message[i]));
 				}
 
@@ -139,22 +143,23 @@ var get_healthcare_items = function (frm, invoice_healthcare_services, $results,
 				// reference_name: "HLC-ENC-2023-00004"
 				// reference_type: "Patient Encounter"
 				// service: "Out Patient Consulting Charge Item"
-			} else {
+			}else {
 				$results.append($placeholder);
 			}
 		}
 	});
 }
 
-var make_list_row = function (columns, invoice_healthcare_services, result = {}) {
+var make_list_row= function(columns, invoice_healthcare_services, result={}) {
 	var me = this;
 	// Make a head row by default (if result not passed)
 	let head = Object.keys(result).length === 0;
 	let contents = ``;
-	columns.forEach(function (column) {
+	columns.forEach(function(column) {
 		contents += `<div class="list-item__content ellipsis">
-			${head ? `<span class="ellipsis">${__(frappe.model.unscrub(column))}</span>`
-				: (column !== "name" ? `<span class="ellipsis">${__(result[column])}</span>`
+			${
+				head ? `<span class="ellipsis">${__(frappe.model.unscrub(column))}</span>`
+				:(column !== "name" ? `<span class="ellipsis">${__(result[column])}</span>`
 					: `<a class="list-id ellipsis">
 						${__(result[column])}</a>`)
 			}
@@ -172,66 +177,58 @@ var make_list_row = function (columns, invoice_healthcare_services, result = {})
 	return $row;
 };
 
-var set_primary_action = function (frm, dialog, $results, invoice_healthcare_services) {
+var set_primary_action= function(frm, dialog, $results, invoice_healthcare_services) {
 	var me = this;
-	dialog.set_primary_action(__('Add'), function () {
+	dialog.set_primary_action(__('Add'), function() {
 		frm.clear_table('items');
 		let checked_values = get_checked_values($results);
-		if (checked_values.length > 0) {
-			if (invoice_healthcare_services) {
+		if(checked_values.length > 0){
+			if(invoice_healthcare_services) {
 				frm.set_value("patient", dialog.fields_dict.patient.input.value);
 			}
 			add_to_item_line(frm, checked_values, invoice_healthcare_services);
 			dialog.hide();
-
-			// setTimeout(() => {
-			// 	if (frm.doc.custom_total_insurance_coverage_amount) frm.set_value("custom_patient_payable_amount", frm.doc.outstanding_amount - frm.doc.custom_total_insurance_coverage_amount);
-			// 	else frm.set_value("custom_patient_payable_amount", frm.doc.outstanding_amount)
-
-			// 	frm.refresh_fields();
-			// 	alert(frm.doc.custom_patient_payable_amount)
-			// }, 1000);
 		}
-		else {
-			if (invoice_healthcare_services) {
+		else{
+			if(invoice_healthcare_services){
 				frappe.msgprint(__("Please select Healthcare Service"));
 			}
-			else {
+			else{
 				frappe.msgprint(__("Please select Drug"));
 			}
 		}
 	});
 };
 
-var get_checked_values = function ($results) {
-	return $results.find('.list-item-container').map(function () {
+var get_checked_values= function($results) {
+	return $results.find('.list-item-container').map(function() {
 		let checked_values = {};
-		if ($(this).find('.list-row-check:checkbox:checked').length > 0) {
+		if ($(this).find('.list-row-check:checkbox:checked').length > 0 ) {
 			checked_values['dn'] = $(this).attr('data-dn');
 			checked_values['dt'] = $(this).attr('data-dt');
 			checked_values['item'] = $(this).attr('data-item');
-			if ($(this).attr('data-rate') != 'undefined') {
+			if($(this).attr('data-rate') != 'undefined'){
 				checked_values['rate'] = $(this).attr('data-rate');
 			}
-			else {
+			else{
 				checked_values['rate'] = false;
 			}
-			if ($(this).attr('data-income-account') != 'undefined') {
+			if($(this).attr('data-income-account') != 'undefined'){
 				checked_values['income_account'] = $(this).attr('data-income-account');
 			}
-			else {
+			else{
 				checked_values['income_account'] = false;
 			}
-			if ($(this).attr('data-qty') != 'undefined') {
+			if($(this).attr('data-qty') != 'undefined'){
 				checked_values['qty'] = $(this).attr('data-qty');
 			}
-			else {
+			else{
 				checked_values['qty'] = false;
 			}
-			if ($(this).attr('data-description') != 'undefined') {
+			if($(this).attr('data-description') != 'undefined'){
 				checked_values['description'] = $(this).attr('data-description');
 			}
-			else {
+			else{
 				checked_values['description'] = false;
 			}
 			return checked_values;
@@ -239,17 +236,16 @@ var get_checked_values = function ($results) {
 	}).get();
 };
 
-var get_drugs_to_invoice = function (frm) {
+var get_drugs_to_invoice = function(frm) {
 	var me = this;
 	let selected_encounter = '';
 	var dialog = new frappe.ui.Dialog({
 		title: __("Get Items from Medication Requests"),
-		fields: [
+		fields:[
 			{ fieldtype: 'Link', options: 'Patient', label: 'Patient', fieldname: "patient", reqd: true },
-			{
-				fieldtype: 'Link', options: 'Patient Encounter', label: 'Patient Encounter', fieldname: "encounter", reqd: true,
-				description: 'Quantity will be calculated only for items which has "Nos" as UoM. You may change as required for each invoice item.',
-				get_query: function (doc) {
+			{ fieldtype: 'Link', options: 'Patient Encounter', label: 'Patient Encounter', fieldname: "encounter", reqd: true,
+				description:'Quantity will be calculated only for items which has "Nos" as UoM. You may change as required for each invoice item.',
+				get_query: function(doc) {
 					return {
 						filters: {
 							patient: dialog.get_value("patient"),
@@ -272,14 +268,14 @@ var get_drugs_to_invoice = function (frm) {
 	});
 	dialog.fields_dict["encounter"].df.onchange = () => {
 		var encounter = dialog.fields_dict.encounter.input.value;
-		if (encounter && encounter != selected_encounter) {
+		if(encounter && encounter!=selected_encounter){
 			selected_encounter = encounter;
 			var method = "healthcare.healthcare.utils.get_drugs_to_invoice";
-			var args = { encounter: encounter };
+			var args = {encounter: encounter};
 			var columns = (["drug_code", "quantity", "description"]);
 			get_healthcare_items(frm, false, $results, $placeholder, method, args, columns);
 		}
-		else if (!encounter) {
+		else if(!encounter){
 			selected_encounter = '';
 			$results.empty();
 			$results.append($placeholder);
@@ -302,8 +298,8 @@ var get_drugs_to_invoice = function (frm) {
 	dialog.show();
 };
 
-var list_row_data_items = function (head, $row, result, invoice_healthcare_services) {
-	if (invoice_healthcare_services) {
+var list_row_data_items = function(head, $row, result, invoice_healthcare_services) {
+	if(invoice_healthcare_services){
 		head ? $row.addClass('list-item--head')
 			: $row = $(`<div class="list-item-container"
 				data-dn= "${result.reference_name}" data-dt= "${result.reference_type}" data-item= "${result.service}"
@@ -313,7 +309,7 @@ var list_row_data_items = function (head, $row, result, invoice_healthcare_servi
 				data-description = "${result.description}">
 				</div>`).append($row);
 	}
-	else {
+	else{
 		head ? $row.addClass('list-item--head')
 			: $row = $(`<div class="list-item-container"
 				data-item= "${result.drug_code}"
@@ -327,45 +323,29 @@ var list_row_data_items = function (head, $row, result, invoice_healthcare_servi
 	return $row
 };
 
-var add_to_item_line = function (frm, checked_values, invoice_healthcare_services) {
-	if (invoice_healthcare_services) {
+var add_to_item_line = function(frm, checked_values, invoice_healthcare_services){
+	if(invoice_healthcare_services){
+		// alert("invoice_healthcare_services")
 		frappe.call({
 			doc: frm.doc,
 			method: "set_healthcare_services",
-			args: {
+			args:{
 				checked_values: checked_values
 			},
-			callback: function () {
+			callback: function() {
 				frm.trigger("validate");
 				frm.refresh_fields();
-
-				// BEGIN MY CODE
-				frappe.call({
-					method: "sabaa.sabaa_utils.get_insurance_data",
-					args: { patient_name: "سالا كرار حيدر", items: frm.doc.items.map( x => x.item_code) },
-					callback: function (data) {
-						if (data.message) {
-							// alert(frm.doc.outstanding_amount)
-						}
-					}
-				});
-				// # if self.custom_total_insurance_coverage_amount:
-				// # 	self.custom_patient_payable_amount = self.outstanding_amount - self.custom_total_insurance_coverage_amount
-				// # else:
-				// # 	self.custom_patient_payable_amount = self.outstanding_amount
-				// alert(frm.doc.outstanding_amount)
-				// END MY CODE
 			}
 		});
 	}
-	else {
-		for (let i = 0; i < checked_values.length; i++) {
+	else{
+		for(let i=0; i<checked_values.length; i++){
 			var si_item = frappe.model.add_child(frm.doc, 'Sales Invoice Item', 'items');
 			frappe.model.set_value(si_item.doctype, si_item.name, 'item_code', checked_values[i]['item']);
 			frappe.model.set_value(si_item.doctype, si_item.name, 'qty', 1);
 			frappe.model.set_value(si_item.doctype, si_item.name, 'reference_dn', checked_values[i]['dn']);
 			frappe.model.set_value(si_item.doctype, si_item.name, 'reference_dt', checked_values[i]['dt']);
-			if (checked_values[i]['qty'] > 1) {
+			if(checked_values[i]['qty'] > 1){
 				frappe.model.set_value(si_item.doctype, si_item.name, 'qty', parseFloat(checked_values[i]['qty']));
 			}
 		}
