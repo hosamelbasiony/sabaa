@@ -30,9 +30,11 @@ fixtures = [
     {"dt": "Custom Field", "filters": [["module", "=", "Tarqeem"]]},
     {"dt": "Custom Field", "filters": [["module", "=", "Sabaa"]]},
 	{"dt": "Code System", "filters": [["name", "=", "ICD10"]]},
-	# {"dt": "Code Value", "filters": [["code_system", "=", "ICD10"]]},
+	{"dt": "Code Value", "filters": [["code_system", "=", "ICD10"]]},
 	{"dt": "UOM", "filters": [["custom_is_custom", "=", True]]},
 	{"dt": "Item"},
+	{"dt": "Price List", "filters": [["name", "not in", ['Standard Selling', 'Standard Buying']]]},
+	{"dt": "Item Price"},
 	{"dt": "Website Settings"},
 	{"dt": "Medical Department", "filters": [["custom_is_custom", "=", True]]},
 	{"dt": "Healthcare Practitioner"},
@@ -43,15 +45,15 @@ fixtures = [
     {"dt": "Patient"},
     {"dt": "Insurance Payor"},
     {"dt": "Insurance Payor Contract"},
- 	# {"dt": "Insurance Payor Eligibility"},
-    # {"dt": "Insurance Payor Eligibility Plan"},
-    # {"dt": "Patient Insurance Policy"},
+ 	{"dt": "Insurance Payor Eligibility Plan"},
+    # {"dt": "Insurance Payor Eligibility"}, # child -> no export
+    {"dt": "Patient Insurance Policy"},
 	# bench export-fixtures
     # bench --site dcode.com migrate --skip-failing
     # bench --site sabaa.tarqim.info migrate
 ]
 
-after_install = "sabaa.install.after_install"
+after_install = "sabaa.sabaa.install.after_install"
 
 
 
