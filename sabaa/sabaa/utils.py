@@ -12,6 +12,8 @@ from frappe import _
 from frappe.utils import cstr, get_link_to_form, rounded, time_diff_in_hours
 from frappe.utils.formatters import format_value
 
+from frappe.utils import flt, format_duration, groupby_metric
+
 from healthcare.healthcare.doctype.healthcare_settings.healthcare_settings import (
 	get_income_account,
 )
@@ -1022,3 +1024,81 @@ def company_on_trash(doc, method):
 		service_unit_doc = frappe.get_doc("Healthcare Service Unit", su.get("name"))
 		service_unit_doc.flags.on_trash_company = True
 		service_unit_doc.delete()
+
+
+
+# BEGIN MY CODE
+@frappe.whitelist()
+def calculate_patient_insurance_coverage(invoice):
+	self = json.loads(invoice)
+
+	total_amount_to_pay = 0.0
+	total_coverage_amount = 0.0
+
+	patient_policies = frappe.get_list(
+		'Patient Insurance Policy',
+		fields = '*',
+		filters = {'patient': self["patient"]} #, 'active': True}
+	)
+	
+	if len(patient_policies):
+
+		patient_policy = patient_policies[0]
+
+		self["custom_patient_insurance_policy"] = patient_policy["name"]
+		self["custom_insurance_eligibility_plan"] = patient_policy["insurance_plan"]
+		self["custom_insurance_payor"] = patient_policy["insurance_payor"]
+
+
+		eligibility_list = frappe.get_list(
+				'Item Insurance Eligibility',
+				fields = '*',
+				filters = [
+					{'insurance_plan': patient_policy["insurance_plan"]},
+					# {'item_code': item.item_code}
+				]
+			)
+		
+		price_list = frappe.get_list(
+				'Item Price',
+				fields = '*',
+				filters = [
+					{'price_list':  "تأمين 1"}
+				]
+			)
+		print(price_list)
+		
+		for item in self["items"]:
+			for x in price_list:
+				if x.item_code == item["item_code"]:
+					item["rate"] = x.price_list_rate
+					item["amount"] = x.price_list_rate
+
+			for x in eligibility_list:
+				if x.item_code == item["item_code"]:
+					if x.coverage != 0 and item["amount"]:
+						item["custom_insurance_coverage"] = flt(x.coverage)
+						item["custom_insurance_coverage_amount"] = flt(item["amount"]) * flt(item["qty"]) * 0.01 * flt(item["custom_insurance_coverage"])
+
+					if item["custom_insurance_coverage_amount"] and flt(item["custom_insurance_coverage_amount"]) > 0:
+						total_coverage_amount += flt(item["custom_insurance_coverage_amount"])
+
+			# total_amount_to_pay += flt(item["amount"]) * flt(item["qty"])
+
+		self["custom_insurance_coverage_amount"] = total_coverage_amount
+
+	for item in self["items"]:
+		total_amount_to_pay += flt(item["amount"]) * flt(item["qty"])
+			
+	self["custom_patient_payable_amount"] = total_amount_to_pay - total_coverage_amount
+
+	return self
+
+	# 	# super(SalesInvoice, self).calculate_taxes_and_totals()
+		
+	# 	# if self.custom_insurance_coverage_amount:
+	# 	# 	self.custom_patient_payable_amount = self.outstanding_amount - self.custom_insurance_coverage_amount
+	# 	# else:
+	# 	# 	self.custom_patient_payable_amount = self.outstanding_amount
+
+# END MY CODE

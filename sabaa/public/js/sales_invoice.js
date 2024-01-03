@@ -16,14 +16,18 @@ frappe.ui.form.on('Sales Invoice', {
 			},__('Insurance'));
 
 
-			frm.add_custom_button(__('Show Insurance Coverage'), function() {
-				alert()
-			},__('Insurance'));
+			// frm.add_custom_button(__('Show Insurance Coverage'), function() {
+
+			// },__('Insurance'));
 
 			frm.add_custom_button(__('Apply Insurance Coverage'), function() {
-				alert('Apply Insurance Coverage')
+				calculate_insurance(frm);
 			},__('Insurance'));
 		}
+	},
+
+	validate(frm) {
+		calculate_insurance(frm);
 	},
 
 	patient(frm) {
@@ -57,6 +61,32 @@ frappe.ui.form.on('Sales Invoice', {
 		set_service_unit(frm);
 	}
 });
+
+var calculate_insurance = function (frm) {
+	frappe.call({
+		method: "sabaa.sabaa.utils.calculate_patient_insurance_coverage",
+		args: {
+			invoice: frm.doc
+		},
+		callback: function(data) {
+			if(data.message){
+				let doc = data.message;
+				frm.set_value("custom_insurance_coverage_amount", doc.custom_insurance_coverage_amount);
+				frm.set_value("custom_patient_payable_amount", doc.custom_patient_payable_amount + frm.doc.rounding_adjustment);
+			
+				// custom_insurance_eligibility_plan
+				frm.set_value("custom_insurance_eligibility_plan", doc.custom_insurance_eligibility_plan);
+				frm.set_value("custom_insurance_payor", doc.custom_insurance_payor);
+				frm.set_value("custom_patient_insurance_policy", doc.custom_patient_insurance_policy);
+
+				frm.trigger("validate");
+				frm.refresh_fields();
+			}else {
+				// TODO
+			}
+		}
+	});	
+};
 
 var set_service_unit = function (frm) {
 	if (frm.doc.service_unit && frm.doc.items.length > 0) {

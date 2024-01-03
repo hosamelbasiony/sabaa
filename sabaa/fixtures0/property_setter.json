@@ -1,0 +1,18 @@
+[
+ {
+  "default_value": null,
+  "doc_type": "Journal Entry",
+  "docstatus": 0,
+  "doctype": "Property Setter",
+  "doctype_or_field": "DocField",
+  "field_name": "voucher_type",
+  "is_system_generated": 0,
+  "modified": "2023-12-30 21:21:56.460020",
+  "module": "Sabaa",
+  "name": "Journal Entry-entry_type-options",
+  "property": "options",
+  "property_type": null,
+  "row_name": null,
+  "value": "Journal Entry\nInter Company Journal Entry\nBank Entry\nCash Entry\nCredit Card Entry\nDebit Note\nCredit Note\nContra Entry\nExcise Entry\nWrite Off Entry\nOpening Entry\nDepreciation Entry\nExchange Rate Revaluation\nExchange Gain Or Loss\nDeferred Revenue\nDeferred Expense\nInsurance Claim Entry"
+ }
+]

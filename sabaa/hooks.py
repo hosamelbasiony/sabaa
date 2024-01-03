@@ -16,9 +16,9 @@ website_context = {
 
 doctype_js = {"Sales Invoice": "public/js/sales_invoice.js"}
 
-override_doctype_class = {
-    "Sales Invoice": "sabaa.sabaa.custom_doctype.sales_invoice.SabaaHealthcareSalesInvoice",
-}
+# override_doctype_class = {
+#     "Sales Invoice": "sabaa.sabaa.custom_doctype.sales_invoice.SabaaHealthcareSalesInvoice",
+# }
 
 override_whitelisted_methods = {
 	"healthcare.healthcare.utils.get_healthcare_services_to_invoice": "sabaa.sabaa.utils.get_healthcare_services_to_invoice",
@@ -29,8 +29,10 @@ fixtures = [
 	# "tarqeem.auth.validate"
     {"dt": "Custom Field", "filters": [["module", "=", "Tarqeem"]]},
     {"dt": "Custom Field", "filters": [["module", "=", "Sabaa"]]},
-	{"dt": "Code System", "filters": [["name", "=", "ICD10"]]},
-	{"dt": "Code Value", "filters": [["code_system", "=", "ICD10"]]},
+    {"dt": "Medical Code Standard"},
+    {"dt": "Medical Code"},
+	# {"dt": "Code System", "filters": [["name", "=", "ICD10"]]},
+	# {"dt": "Code Value", "filters": [["code_system", "=", "ICD10"]]},
 	{"dt": "UOM", "filters": [["custom_is_custom", "=", True]]},
 	{"dt": "Item"},
 	{"dt": "Price List", "filters": [["name", "not in", ['Standard Selling', 'Standard Buying']]]},

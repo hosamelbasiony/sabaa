@@ -1,0 +1,12 @@
+[
+ {
+  "docstatus": 0,
+  "doctype": "Insurance Payor Eligibility Plan",
+  "insurance_payor": "شرق القناة",
+  "insurance_plan_name": "خطة التأمين الذهبي",
+  "is_active": 1,
+  "modified": "2023-12-29 03:47:44.534101",
+  "name": "خطة التأمين الذهبي",
+  "price_list": "تأمين 1"
+ }
+]
