@@ -22,3 +22,12 @@ div[onboarding_name] {
     /* background: red!important; */
     display: none!important;
 }
+
+div[item-name="ERPNext Settings"] {
+    /* background: red!important; */
+    display: none!important;
+}
+
+div[item-name="ERPNext Settings"], div[item-name="ERPNext Integrations"] {
+    display: none!important;
+}

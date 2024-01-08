@@ -192,7 +192,7 @@ class InsuranceClaim(Document):
 				sii.item_code,
 				sii.amount AS sales_invoice_item_amount,
 				sii.coverage_percentage AS claim_coverage,
-				sii.insurance_coverage_amount AS claim_amount,
+				sii.custom_insurance_coverage_amount AS claim_amount,
 				sii.discount_percentage AS invoice_discount,
 				sii.discount_amount AS invoice_discount_amount,
 				jea.credit_in_account_currency AS allocated_amount,
@@ -200,7 +200,7 @@ class InsuranceClaim(Document):
 				'Draft' AS status
 			FROM `tabPatient Insurance Coverage` AS pic
 			INNER JOIN `tabSales Invoice Item` AS sii ON
-				(pic.name=sii.insurance_coverage AND sii.docstatus=1)
+				(pic.name=sii.custom_insurance_coverage AND sii.docstatus=1)
 			INNER JOIN `tabSales Invoice` AS si ON
 				(si.name=sii.parent AND si.docstatus=1)
 			INNER JOIN `tabJournal Entry Account` AS jea ON
@@ -225,6 +225,17 @@ class InsuranceClaim(Document):
 				'to_date': self.to_date,
 				'statuses': tuple(valid_statuses)
 		}, as_dict=1)
+
+		# coverages = frappe.db.sql('''
+		# 	SELECT
+		# 		pic.*,
+		# 		pic.name AS insurance_coverage,
+		# 		"123.5" AS claim_amount,
+		# 		'Draft' AS status
+		# 	FROM `tabPatient Insurance Coverage` AS pic
+		# 	''',
+		# 	{}, as_dict=1)
+
 
 		if not coverages:
 			frappe.throw(_('No matching Patient Insurance Coverages found, please check the filters'), title=_('No Data'))

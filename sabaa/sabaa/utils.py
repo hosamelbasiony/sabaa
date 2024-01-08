@@ -5,6 +5,7 @@
 
 import json
 import math
+import uuid
 
 import frappe
 from erpnext.setup.utils import insert_record
@@ -88,6 +89,12 @@ def get_appointments_to_invoice(patient, company):
 		order_by="appointment_date",
 	)
 
+	# "reference_type": "Clinical Procedure",
+	# "reference_name": procedure.name,
+	# "service": service_item,
+	# "rate": procedure.consumable_total_amount,
+	# "description": procedure.consumption_details,
+
 	for appointment in patient_appointments:
 		# Procedure Appointments
 		if appointment.procedure_template:
@@ -115,12 +122,15 @@ def get_appointments_to_invoice(patient, company):
 				service_item = details.get("service_item")
 				practitioner_charge = details.get("practitioner_charge")
 				income_account = get_income_account(appointment.practitioner, appointment.company)
+
+			calc_service_item = calculate_item_price_and_insurance_coverage(appointment, service_item, patient.name)
 			appointments_to_invoice.append(
 				{
 					"reference_type": "Patient Appointment",
 					"reference_name": appointment.name,
 					"service": service_item,
-					"rate": practitioner_charge,
+					# "rate": practitioner_charge,
+					"rate": calc_service_item.rate,
 					"income_account": income_account,
 				}
 			)
@@ -154,12 +164,15 @@ def get_encounters_to_invoice(patient, company):
 					practitioner_charge = details.get("practitioner_charge")
 					income_account = get_income_account(encounter.practitioner, encounter.company)
 
+					calc_service_item = calculate_item_price_and_insurance_coverage(encounter, service_item, patient)
+
 				encounters_to_invoice.append(
 					{
 						"reference_type": "Patient Encounter",
 						"reference_name": encounter.name,
 						"service": service_item,
-						"rate": practitioner_charge,
+						"rate": calc_service_item.rate,
+						# "rate": practitioner_charge,
 						"income_account": income_account,
 					}
 				)
@@ -216,19 +229,63 @@ def get_clinical_procedures_to_invoice(patient, company):
 	procedures = frappe.get_list(
 		"Clinical Procedure",
 		fields="*",
-		filters={"patient": patient.name, "company": company, "invoiced": False},
+		filters=[["status", "=", "Completed"], ["docstatus", "!=", "2"], ["patient", "=", patient.name], ["company", "=", company], ["invoiced", "=", False]]
 	)
+	
 	for procedure in procedures:
 		if not procedure.appointment:
 			item, is_billable = frappe.get_cached_value(
 				"Clinical Procedure Template", procedure.procedure_template, ["item", "is_billable"]
 			)
+
 			if procedure.procedure_template and is_billable:
+				procedure_template_item_code = frappe.db.get_value("Clinical Procedure Template", [["name", "=", procedure.procedure_template]], ["item_code"])
+				calc_service_item = calculate_item_price_and_insurance_coverage(procedure, procedure_template_item_code, patient.name)
+				
 				clinical_procedures_to_invoice.append(
-					{"reference_type": "Clinical Procedure", "reference_name": procedure.name, "service": item}
+					{
+						"reference_type": "Clinical Procedure",
+						"reference_name": procedure.name,
+						"service":item,
+						"rate": calc_service_item.rate,
+						"description": procedure.name,
+					}
 				)
 
 		# consumables
+		# MY CODE
+		procedure.invoice_separately_as_consumables = True
+		# Clinical Procedure Item
+
+		items = frappe.db.get_all(
+			"Clinical Procedure Item",
+			fields=["*"],
+			filters=[
+				["docstatus", "!=", "2"], 
+				["parenttype", "=", "Clinical Procedure"], 
+				["parent", "=", procedure.name]
+			]
+		)
+		# actual_qty
+		# batch_no
+		# conversion_factor
+		# invoice_separately_as_consumables
+		# item_code
+		# item_name
+		# parent
+		# parentfield
+		# parenttype
+		# qty
+		# stock_uom
+		# transfer_qty
+		# uom
+		procedure.consumable_total_amount = 0.0
+		for item in items:
+			item.rate = item.qty * 25
+			procedure.consumable_total_amount += flt(item.rate)
+
+		# END MY CODE
+			
 		if (
 			procedure.invoice_separately_as_consumables
 			and procedure.consume_stock
@@ -277,6 +334,10 @@ def get_clinical_procedures_to_invoice(patient, company):
 		item, is_billable = frappe.get_cached_value(
 			"Clinical Procedure Template", prescription.procedure, ["item", "is_billable"]
 		)
+		# MY CODE
+		is_billable = False
+		# END MY CODE
+		
 		if is_billable:
 			clinical_procedures_to_invoice.append(
 				{
@@ -329,11 +390,15 @@ def get_inpatient_services_to_invoice(patient, company):
 					qty = rounded(floor + 0.5, 1)
 				if qty <= 0:
 					qty = 0.5
+
+			calc_service_item = calculate_item_price_and_insurance_coverage(inpatient_occupancy, service_unit_type.item, patient.name)
+
 			services_to_invoice.append(
 				{
 					"reference_type": "Inpatient Occupancy",
 					"reference_name": inpatient_occupancy.name,
 					"service": service_unit_type.item,
+					"rate": calc_service_item.rate,
 					"qty": qty,
 				}
 			)
@@ -402,6 +467,10 @@ def get_therapy_sessions_to_invoice(patient, company):
 
 @frappe.whitelist()
 def get_appointment_billing_item_and_rate(doc):
+	
+	# print("🧑🧑🧑get_appointment_billing_item_and_rate🧑🧑🧑")
+	# print(doc)
+
 	if isinstance(doc, str):
 		doc = json.loads(doc)
 		doc = frappe.get_doc(doc)
@@ -1028,6 +1097,75 @@ def company_on_trash(doc, method):
 
 
 # BEGIN MY CODE
+		
+def manage_invoice_validate(doc, method):
+    frappe.msgprint("from my custome event handler") 
+
+def calculate_item_price_and_insurance_coverage(item, item_code, patient):
+
+	rate_set = False
+
+	patient_policies = frappe.get_list(
+		'Patient Insurance Policy',
+		fields = '*',
+		filters = [['patient', "=", patient], ["docstatus", "!=", 2]]
+	)
+
+	if len(patient_policies):
+		patient_policy = patient_policies[0]
+		eligibility_list = frappe.get_list(
+				'Item Insurance Eligibility',
+				fields = '*',
+				filters = [
+					{'insurance_plan': patient_policy["insurance_plan"]},
+				]
+			)
+		
+		
+		price_list_name = frappe.db.get_value("Insurance Payor Eligibility Plan", [["name", "=", patient_policy["insurance_plan"]]], ["price_list"])
+		
+		price_list = frappe.get_list(
+				'Item Price',
+				fields = '*',
+				filters = [
+					{'price_list':  price_list_name}
+				]
+			)
+		
+		for x in price_list:
+			if x.item_code == item_code:
+				rate_set = True
+				item.rate = x.price_list_rate
+				item.amount = x.price_list_rate
+				item.base_rate = x.price_list_rate
+				item.base_net_rate = x.price_list_rate
+				item.stock_uom_rate = x.price_list_rate
+				item.net_rate = x.price_list_rate		
+		
+	if rate_set == False:
+		
+		price_list, price_list_rate = frappe.db.get_value("Item Price", [["price_list", "=", "Standard Selling"],["item_code", "=", item_code]], ["price_list", "price_list_rate"])
+		# price_list, price_list_rate = frappe.db.get_value("Item Price", [["price_list", "=", "Standard Selling"],["item_code", "=", "Hosam Outpatient Charge Item"]], ["price_list", "price_list_rate"])
+		# price_list, price_list_rate = frappe.db.get_value("Item Price", [["price_list", "=", "Standard Selling"],["item_code", "=", "ولادة قيصرية بسيطة"]], ["price_list", "price_list_rate"])
+		
+		if not price_list_rate:
+			frappe.throw(
+				_("Please configure Standard Selling rate for {0}").format(
+					item.item_name
+				),
+				title=_("Missing Configuration"),
+			)
+
+		item.rate = price_list_rate
+		item.amount = price_list_rate
+		item.base_rate = price_list_rate
+		item.base_net_rate = price_list_rate
+		item.stock_uom_rate = price_list_rate
+		item.net_rate = price_list_rate
+
+	return item
+
+
 @frappe.whitelist()
 def calculate_patient_insurance_coverage(invoice):
 	self = json.loads(invoice)
@@ -1036,9 +1174,10 @@ def calculate_patient_insurance_coverage(invoice):
 	total_coverage_amount = 0.0
 
 	patient_policies = frappe.get_list(
-		'Patient Insurance Policy',
+		'Patient Insurance Policy', 
 		fields = '*',
-		filters = {'patient': self["patient"]} #, 'active': True}
+		filters = [['patient', "=", self["patient"]], ["docstatus", "!=", 2]]
+		# filters = {'patient': self["patient"]}
 	)
 	
 	if len(patient_policies):
@@ -1066,30 +1205,52 @@ def calculate_patient_insurance_coverage(invoice):
 					{'price_list':  "تأمين 1"}
 				]
 			)
-		print(price_list)
 		
 		for item in self["items"]:
 			for x in price_list:
 				if x.item_code == item["item_code"]:
 					item["rate"] = x.price_list_rate
 					item["amount"] = x.price_list_rate
+					item["base_rate"] = x.price_list_rate
+					item["base_net_rate"] = x.price_list_rate
+					item["stock_uom_rate"] = x.price_list_rate
+					item["net_rate"] = x.price_list_rate
 
 			for x in eligibility_list:
 				if x.item_code == item["item_code"]:
 					if x.coverage != 0 and item["amount"]:
+						# base_net_rate
+						# amount
+						# base_rate
+						# stock_uom_rate
+						# net_rate
+
+						# base_amount
+						# base_net_amount
+						# net_amount
+						# custom_insurance_coverage_amount
 						item["custom_insurance_coverage"] = flt(x.coverage)
 						item["custom_insurance_coverage_amount"] = flt(item["amount"]) * flt(item["qty"]) * 0.01 * flt(item["custom_insurance_coverage"])
 
+						item["base_amount"] = flt(item["amount"]) * flt(item["qty"])
+						item["base_net_amount"] = flt(item["amount"]) * flt(item["qty"])
+						item["net_amount"] = flt(item["amount"]) * flt(item["qty"])
+
 					if item["custom_insurance_coverage_amount"] and flt(item["custom_insurance_coverage_amount"]) > 0:
 						total_coverage_amount += flt(item["custom_insurance_coverage_amount"])
+						# frappe.msgprint(str(item["description"]) + " - " + str(item["custom_insurance_coverage_amount"]))
 
 			# total_amount_to_pay += flt(item["amount"]) * flt(item["qty"])
 
 		self["custom_insurance_coverage_amount"] = total_coverage_amount
 
 	for item in self["items"]:
-		total_amount_to_pay += flt(item["amount"]) * flt(item["qty"])
-			
+		total_amount_to_pay += flt(item["amount"]) # * flt(item["qty"])
+		# print(flt(item["amount"]) * flt(item["qty"]))
+		# print(flt(item["amount"]) * flt(item["qty"]))
+		# print(flt(item["amount"]) * flt(item["qty"]))
+		# frappe.msgprint(item["item_code"] + " - amount_to_pay - " + str(flt(item["amount"]) * flt(item["qty"])))
+
 	self["custom_patient_payable_amount"] = total_amount_to_pay - total_coverage_amount
 
 	return self
@@ -1100,5 +1261,159 @@ def calculate_patient_insurance_coverage(invoice):
 	# 	# 	self.custom_patient_payable_amount = self.outstanding_amount - self.custom_insurance_coverage_amount
 	# 	# else:
 	# 	# 	self.custom_patient_payable_amount = self.outstanding_amount
+
+@frappe.whitelist()
+def get_procedure_template_items(procedure_template):
+	
+	# "name": "06df6ff7de",
+	# "owner": "Administrator",
+	# "creation": "2024-01-06 08:03:32.012630",
+	# "modified": "2024-01-06 08:30:44.121700",
+	# "modified_by": "Administrator",
+	# "docstatus": 0,
+	# "idx": 1,
+	# "item_code": "فكريل 1 ايجي قاطع",
+	# "item_name": "فكريل 1 ايجي قاطع",
+	# "qty": 1.0,
+	# "uom": "Nos",
+	# "invoice_separately_as_consumables": 1,
+	# "conversion_factor": 1.0,
+	# "stock_uom": "Nos",
+	# "transfer_qty": 0.0,
+	# "actual_qty": 0.0,
+	# "parent": "ولادة قيصرية بسيطة",
+	# "parentfield": "items",
+	# "parenttype": "Clinical Procedure Template",
+	# "doctype": "Clinical Procedure Item"
+
+	items = frappe.db.get_all(
+		"Clinical Procedure Item",
+		fields=["*"],
+		filters=[
+			# ["docstatus", "!=", "2"], 
+			# ["parenttype", "=", "Clinical Procedure"], 
+			["parent", "=", procedure_template]
+		]
+	)
+
+	return items
+
+
+@frappe.whitelist()
+def insert_insurance_journal_entry(journal_entry, invoice):	
+	save_point = ""
+	try:
+
+		if frappe.db.get_value(
+				"Sales Invoice", invoice, "custom_claim_generated"
+			):
+				frappe.msgprint("Insurance Claim Entry already generated")
+				# return
+	
+		entry = json.loads(journal_entry)
+		
+		save_point = 'save_point_{}'.format(uuid.uuid4().hex[:6].upper())
+		frappe.db.savepoint(save_point=save_point)
+		
+		doc = frappe.get_doc(entry)
+		doc.insert()
+		# doc.submit()
+
+		frappe.db.sql(
+			"""update `tabSales Invoice` set `custom_claim_generated` = 1
+			where name=%(invoice)s""",
+			{"invoice": invoice},
+		)
+
+		# custom_claim_generated
+	
+		frappe.db.commit()
+	except Exception as inst:
+		print(inst)
+		frappe.db.rollback(save_point=save_point)
+	finally:
+		pass
+
+	return True
+
+@frappe.whitelist()
+def insert_doctor_fees_journal_entry(journal_entry, invoice):	
+	try:
+
+		# procedure_doc = frappe.get_doc({
+		# 	"doctype": "Clinical Procedure",
+		# 	"name": invoice
+		# })
+		
+		# frappe.msgprint(frappe.db.get_value("Clinical Procedure", invoice, "custom_doctor_fees_journal_entry"))
+
+		if frappe.db.get_value(
+				# "voucher_type": "Doctor Fees Entry"
+				"Journal Entry", [["docstatus", "!=", 3], ["voucher_type", "=", "Doctor Fees Entry"], ["custom_clinical_procedure", "=", invoice]], "name"
+			):
+				frappe.msgprint("Doctor Fees Entry already generated")
+				return
+
+		entry = json.loads(journal_entry)
+		
+		save_point = 'save_point_{}'.format(uuid.uuid4().hex[:6].upper())
+		frappe.db.savepoint(save_point=save_point)
+		
+		doc = frappe.get_doc(entry)
+		doc.insert()
+
+		# procedure_doc.custom_doctor_fees_journal_entry = doc.name
+		# procedure_doc.save()
+
+		# frappe.db.sql(
+		# 	"""update `tabClinical Procedure` set `custom_doctor_fees_journal_entry` = %(journal_entry_name)s
+		# 	where name=%(invoice)s""",
+		# 	{
+		# 		"journal_entry_name": doc.name,
+		# 		"invoice": invoice
+		# 	},
+		# )
+		
+		frappe.db.commit()
+	except Exception as inst:
+		print(inst)
+		frappe.db.rollback(save_point=save_point)
+	finally:
+		pass
+
+	return True
+
+
+@frappe.whitelist()
+def get_supplier_data(practitioner_name, item_code = ""):
+	supplier = None
+	price_list_rate = None
+	supplier_name = frappe.db.get_value("Healthcare Practitioner", practitioner_name, "supplier")
+	supplier_list = frappe.get_list(
+		"Supplier",
+		fields="*",
+		filters={
+			"name": supplier_name,
+		},
+		order_by="name",
+	)
+
+	if len(supplier_list):
+		supplier = supplier_list[0]
+		default_price_list = supplier.default_price_list
+
+		price_list_rate = frappe.db.get_value("Item Price", [["price_list", "=", default_price_list], ["item_code", "=", item_code]], ["price_list_rate"])
+		frappe.msgprint(str(price_list_rate))
+
+	return {
+		"supplier_name": supplier_name,
+		"supplier": supplier,
+		"price_list_rate": price_list_rate,
+	}
+
+@frappe.whitelist()
+def get_company(company_name):
+ company = frappe.get_doc("Company", company_name)
+ return company
 
 # END MY CODE

@@ -14,7 +14,11 @@ website_context = {
 	"splash_image": "/assets/sabaa/images/sabaa-splash.svg",
 }
 
-doctype_js = {"Sales Invoice": "public/js/sales_invoice.js"}
+doctype_js = {
+    "Sales Invoice": "public/js/sales_invoice.js",
+    "Clinical Procedure": "public/js/clinical_procedure.js"
+}
+# doctype_js = {"Clinical Procedure": "public/js/clinical_procedure.js"}
 
 # override_doctype_class = {
 #     "Sales Invoice": "sabaa.sabaa.custom_doctype.sales_invoice.SabaaHealthcareSalesInvoice",
@@ -23,6 +27,10 @@ doctype_js = {"Sales Invoice": "public/js/sales_invoice.js"}
 override_whitelisted_methods = {
 	"healthcare.healthcare.utils.get_healthcare_services_to_invoice": "sabaa.sabaa.utils.get_healthcare_services_to_invoice",
 	# "healthcare.healthcare.utils.get_healthcare_services_to_invoice": "sabaa.sabaa.utils.get_healthcare_services_to_invoice"
+}
+
+override_doctype_dashboards = {
+	"Patient": "sabaa.sabaa.custom_doctype.patient_dashboard.get_data"
 }
 
 fixtures = [
@@ -57,7 +65,13 @@ fixtures = [
 
 after_install = "sabaa.sabaa.install.after_install"
 
-
+doc_events = {
+	"Sales Invoice": {
+		"validate": "sabaa.sabaa.utils.manage_invoice_validate",
+		# "on_submit": "sabaa.sabaa.utils.manage_invoice_submit_cancel",
+		# "on_cancel": "sabaa.sabaa.utils.manage_invoice_submit_cancel",
+	}
+}
 
 
 

@@ -35,7 +35,7 @@
    "fieldname": "naming_series",
    "fieldtype": "Select",
    "label": "Series",
-   "options": "INS-PLCY-.YYYY.-",
+   "options": "INS-POLICY-.YYYY.-",
    "set_only_once": 1
   },
   {
