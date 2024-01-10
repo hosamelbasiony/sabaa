@@ -36,9 +36,10 @@
   "op_consulting_charge_item",
   "clinical_procedure_consumable_item",
   "column_break_13",
+  "medical_team_fees_item",
   "anaesthesiologist_fees_item",
   "assistant_doctor_fees_item",
-  "assistant__anaesthesiologist_fees_item",
+  "assistant_anaesthesiologist_fees_item",
   "sb_in_ac",
   "income_account",
   "receivable_account",
@@ -261,12 +262,6 @@
    "options": "Item"
   },
   {
-   "fieldname": "assistant__anaesthesiologist_fees_item",
-   "fieldtype": "Link",
-   "label": "Assistant  Anaesthesiologist Fees Item",
-   "options": "Item"
-  },
-  {
    "fieldname": "sb_in_ac",
    "fieldtype": "Section Break",
    "label": "Default Accounts"
@@ -377,11 +372,23 @@
    "fieldtype": "Small Text",
    "ignore_xss_filter": 1,
    "label": "Result Emailed Message"
+  },
+  {
+   "fieldname": "medical_team_fees_item",
+   "fieldtype": "Link",
+   "label": "Medical Team Fees Item",
+   "options": "Item"
+  },
+  {
+   "fieldname": "assistant_anaesthesiologist_fees_item",
+   "fieldtype": "Link",
+   "label": "Assistant Anaesthesiologist Fees Item",
+   "options": "Item"
   }
  ],
  "issingle": 1,
  "links": [],
- "modified": "2024-01-08 15:47:11.079750",
+ "modified": "2024-01-09 02:29:43.214563",
  "modified_by": "Administrator",
  "module": "Sabaa",
  "name": "Healthcare Settings",

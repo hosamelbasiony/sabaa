@@ -1,0 +1,29 @@
+{
+ "cards": [],
+ "charts": [
+  {
+   "chart": "Procedures Bar Chart",
+   "width": "Half"
+  },
+  {
+   "chart": "Procedures By Type",
+   "width": "Half"
+  },
+  {
+   "chart": "Procedures Count",
+   "width": "Full"
+  }
+ ],
+ "creation": "2024-01-09 07:18:21.887359",
+ "dashboard_name": "Sabaa Dashboard",
+ "docstatus": 0,
+ "doctype": "Dashboard",
+ "idx": 0,
+ "is_default": 1,
+ "is_standard": 1,
+ "modified": "2024-01-09 07:44:43.798810",
+ "modified_by": "Administrator",
+ "module": "Sabaa",
+ "name": "Sabaa Dashboard",
+ "owner": "Administrator"
+}

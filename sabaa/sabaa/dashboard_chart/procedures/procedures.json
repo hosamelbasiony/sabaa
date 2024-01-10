@@ -1,0 +1,32 @@
+{
+ "chart_name": "Procedures",
+ "chart_type": "Report",
+ "creation": "2024-01-09 07:43:44.147398",
+ "custom_options": "{\"x_field\": \"procedure_template\", \"chart_type\": \"Line\", \"y_axis_fields\": [{\"idx\": 1, \"__islocal\": true, \"name\": \"row 1\", \"y_field\": \"count\"}], \"y_fields\": [\"count\"], \"colors\": [null]}",
+ "docstatus": 0,
+ "doctype": "Dashboard Chart",
+ "filters_json": "{\"from_date\":\"2020-01-01\",\"to_date\":\"2024-01-09\"}",
+ "group_by_type": "Count",
+ "idx": 0,
+ "is_public": 0,
+ "is_standard": 1,
+ "modified": "2024-01-09 07:43:44.224278",
+ "modified_by": "Administrator",
+ "module": "Sabaa",
+ "name": "Procedures",
+ "number_of_groups": 0,
+ "owner": "Administrator",
+ "report_name": "Clinical Procedures Analysis",
+ "roles": [],
+ "time_interval": "Yearly",
+ "timeseries": 0,
+ "timespan": "Last Year",
+ "type": "Line",
+ "use_report_chart": 0,
+ "x_field": "procedure_template",
+ "y_axis": [
+  {
+   "y_field": "count"
+  }
+ ]
+}

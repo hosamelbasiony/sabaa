@@ -1,0 +1,22 @@
+{
+ "creation": "2024-01-09 07:19:49.132104",
+ "docstatus": 0,
+ "doctype": "Number Card",
+ "filters_json": "{}",
+ "function": "Count",
+ "idx": 0,
+ "is_public": 0,
+ "is_standard": 1,
+ "label": "Sum of Clinical Procedures",
+ "modified": "2024-01-09 07:19:49.165501",
+ "modified_by": "Administrator",
+ "module": "Sabaa",
+ "name": "Sum of Clinical Procedures",
+ "owner": "Administrator",
+ "report_field": "count",
+ "report_function": "Sum",
+ "report_name": "Clinical Procedures Analysis",
+ "show_percentage_stats": 1,
+ "stats_time_interval": "Daily",
+ "type": "Report"
+}

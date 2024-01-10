@@ -2,11 +2,11 @@
 // For license information, please see license.txt
 
 let COMPANY = null;
+let HEALTHCARE_SETTINGS = null;
 
 frappe.ui.form.on('Clinical Procedure', {
 	refresh: function (frm) {
-
-		if( !COMPANY ) {
+		if (!COMPANY) {
 			// get_company
 			frappe.call({
 				method: 'sabaa.sabaa.utils.get_company',
@@ -15,17 +15,19 @@ frappe.ui.form.on('Clinical Procedure', {
 				},
 				callback: function (data) {
 					if (data.message) {
-						COMPANY = data.message;
-						console.log("COMPANY: ", COMPANY)
+						COMPANY = data.message.company;
+						HEALTHCARE_SETTINGS = data.message.healthcare_settings;
+						console.log("COMPANY: ", COMPANY);
+						console.log("HEALTHCARE_SETTINGS: ", HEALTHCARE_SETTINGS);
 					}
 				}
 			});
 		}
 
-		let btn_label = 'Set doctor fees entry';
+		let btn_label = 'Set doctor fees entries';
 
 		frm.add_custom_button(__(btn_label), function () {
-			add_doctor_fees(frm);
+			// add_doctor_fees(frm);
 		}).addClass("btn-primaryy");
 
 		frm.set_value('consume_stock', 1);
@@ -66,9 +68,11 @@ frappe.ui.form.on('Clinical Procedure', {
 
 		// if( frm.doc.docstatus == 0 ) getConsumables();
 
-		frm.add_custom_button(__('Get Consumables List'), function () {
-			getConsumables();
-		}, __("Consumables"));
+		if (frm.doc.status != "Completed") {
+			frm.add_custom_button(__('Get Consumables List'), function () {
+				getConsumables();
+			}, __("Consumables"));
+		}
 
 		frm.set_query('patient', function () {
 			return {
@@ -207,7 +211,178 @@ frappe.ui.form.on('Clinical Procedure', {
 			});
 		}
 	},
+
+	custom_calculate_fees: function (frm) {
+		// custom_medical_team_members
+		// محمد عبد الرحمن
+
+		frappe.call({
+			method: 'sabaa.sabaa.utils.get_doctor_fees',
+			args: {
+				patient: frm.doc.patient
+			},
+			callback: function (data) {
+				if (data.message) {
+
+					if (!frm.doc.custom_medical_team_members) return;
+
+					for (let medical_team_member of frm.doc.custom_medical_team_members) {
+						// healthcare_practitioner
+						// role - fees_item - fees - journal_entry
+
+						// {
+						// 	"item_prices": [
+						// 	  {
+						// 		"price_list": "Standard Buying",
+						// 		"item_code": "أجر طبيب التخدير",
+						// 		"price_list_rate": 2500
+						// 	  },
+						// 	  {
+						// 		"price_list": "Standard Buying",
+						// 		"item_code": "أجر طبيب التخدير المساعد",
+						// 		"price_list_rate": 2000
+						// 	  },
+						// 	  {
+						// 		"price_list": "Standard Buying",
+						// 		"item_code": "أجر الطبيب المساعد",
+						// 		"price_list_rate": 2250
+						// 	  }
+						// 	],
+						// 	"insurance_plan": null,
+						// 	"price_list": null
+						//   }
+
+						let price = null;
+
+						if (medical_team_member.role == "Anesthesiologist") {
+
+							price = data.message.item_prices.find(x =>
+								x.price_list == data.message.price_list && x.item_code == HEALTHCARE_SETTINGS.anaesthesiologist_fees_item);
+							if (!price) price = data.message.item_prices.find(x => x.item_code == HEALTHCARE_SETTINGS.anaesthesiologist_fees_item);
+
+						} else if (medical_team_member.role == "Assistant Doctor") {
+
+							price = data.message.item_prices.find(x =>
+								x.price_list == data.message.price_list && x.item_code == HEALTHCARE_SETTINGS.assistant_doctor_fees_item);
+							if (!price) price = data.message.item_prices.find(x => x.item_code == HEALTHCARE_SETTINGS.assistant_doctor_fees_item);
+
+						} else if (medical_team_member.role == "Assistant Anesthesiologist") {
+
+							price = data.message.item_prices.find(x =>
+								x.price_list == data.message.price_list && x.item_code == HEALTHCARE_SETTINGS.assistant_anaesthesiologist_fees_item);
+							if (!price) price = data.message.item_prices.find(x => x.item_code == HEALTHCARE_SETTINGS.assistant_anaesthesiologist_fees_item);
+
+						}
+
+						if (price) medical_team_member.fees = price.price_list_rate;
+
+
+						// HEALTHCARE_SETTINGS
+						// anaesthesiologist_fees_item
+						// assistant_anaesthesiologist_fees_item
+						// assistant_doctor_fees_item
+						// clinical_procedure_consumable_item
+						// medical_team_fees_item
+					}
+
+				}
+			}
+		});
+	},
 });
+
+frappe.ui.form.on('Medical Team Member', {
+	custom_medical_team_members_add: function(frm, cdt, cdn) {
+		// 
+	},
+
+	role: function(frm, cdt, cdn) {
+		calculate_doctor_fees(frm);
+	},
+
+	healthcare_practitioner: function(frm, cdt, cdn) {
+		calculate_doctor_fees(frm);
+	},
+
+	custom_medical_team_members_remove: function(frm, cdt, cdn) {
+		// 
+	}
+})
+
+var calculate_doctor_fees = (frm) => {
+	frappe.call({
+		method: 'sabaa.sabaa.utils.get_doctor_fees',
+		args: {
+			patient: frm.doc.patient
+		},
+		callback: function (data) {
+			if (data.message) {
+
+				if (!frm.doc.custom_medical_team_members) return;
+
+				for (let medical_team_member of frm.doc.custom_medical_team_members) {
+					// healthcare_practitioner
+					// role - fees_item - fees - journal_entry
+
+					// {
+					// 	"item_prices": [
+					// 	  {
+					// 		"price_list": "Standard Buying",
+					// 		"item_code": "أجر طبيب التخدير",
+					// 		"price_list_rate": 2500
+					// 	  },
+					// 	  {
+					// 		"price_list": "Standard Buying",
+					// 		"item_code": "أجر طبيب التخدير المساعد",
+					// 		"price_list_rate": 2000
+					// 	  },
+					// 	  {
+					// 		"price_list": "Standard Buying",
+					// 		"item_code": "أجر الطبيب المساعد",
+					// 		"price_list_rate": 2250
+					// 	  }
+					// 	],
+					// 	"insurance_plan": null,
+					// 	"price_list": null
+					//   }
+
+					let price = null;
+
+					if (medical_team_member.role == "Anesthesiologist") {
+
+						price = data.message.item_prices.find(x =>
+							x.price_list == data.message.price_list && x.item_code == HEALTHCARE_SETTINGS.anaesthesiologist_fees_item);
+						if (!price) price = data.message.item_prices.find(x => x.item_code == HEALTHCARE_SETTINGS.anaesthesiologist_fees_item);
+
+					} else if (medical_team_member.role == "Assistant Doctor") {
+
+						price = data.message.item_prices.find(x =>
+							x.price_list == data.message.price_list && x.item_code == HEALTHCARE_SETTINGS.assistant_doctor_fees_item);
+						if (!price) price = data.message.item_prices.find(x => x.item_code == HEALTHCARE_SETTINGS.assistant_doctor_fees_item);
+
+					} else if (medical_team_member.role == "Assistant Anesthesiologist") {
+
+						price = data.message.item_prices.find(x =>
+							x.price_list == data.message.price_list && x.item_code == HEALTHCARE_SETTINGS.assistant_anaesthesiologist_fees_item);
+						if (!price) price = data.message.item_prices.find(x => x.item_code == HEALTHCARE_SETTINGS.assistant_anaesthesiologist_fees_item);
+
+					}
+
+					if (price) medical_team_member.fees = price.price_list_rate;
+
+
+					// HEALTHCARE_SETTINGS
+					// anaesthesiologist_fees_item
+					// assistant_anaesthesiologist_fees_item
+					// assistant_doctor_fees_item
+					// clinical_procedure_consumable_item
+					// medical_team_fees_item
+				}
+
+			}
+		}
+	})
+};
 
 var add_doctor_fees = (frm) => {
 	if (frm.doc.procedure_template) {

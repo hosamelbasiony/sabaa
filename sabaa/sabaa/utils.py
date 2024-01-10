@@ -1414,6 +1414,56 @@ def get_supplier_data(practitioner_name, item_code = ""):
 @frappe.whitelist()
 def get_company(company_name):
  company = frappe.get_doc("Company", company_name)
- return company
+ healthcare_settings = frappe.get_doc("Healthcare Settings")
+ return {
+	 "company": company,
+	 "healthcare_settings": healthcare_settings
+ }
+
+@frappe.whitelist()
+def get_doctor_fees(patient=None):
+	
+	print(patient)
+
+	healthcare_settings = frappe.get_doc("Healthcare Settings", [
+	 													"anaesthesiologist_fees_item", 
+	 													"assistant_doctor_fees_item", 
+	 													"assistant_anaesthesiologist_fees_item", 
+	 													"clinical_procedure_consumable_item", 
+	 													"medical_team_fees_item", 
+	 												])
+	price_list = None
+
+	fees_item_list = list()
+	fees_item_list.append(healthcare_settings.anaesthesiologist_fees_item)
+	fees_item_list.append(healthcare_settings.assistant_doctor_fees_item)
+	fees_item_list.append(healthcare_settings.assistant_anaesthesiologist_fees_item)
+
+	price_lists = list()
+	price_lists.append("Standard Buying")
+
+	print(patient)
+	
+	# امين كاظم حسن
+	insurance_plan = frappe.db.get_value('Patient Insurance Policy', {"patient": patient}, "insurance_plan")
+	if insurance_plan:		
+		price_list = frappe.db.get_value('Insurance Payor Eligibility Plan', insurance_plan, "price_list")
+		price_lists.append(price_list)
+	
+	item_prices = frappe.get_list(
+			"Item Price",
+			fields=["price_list", "item_code", "price_list_rate"],
+			filters={
+				"item_code": ["in", fees_item_list],
+				"price_list": ["in", price_lists],
+			}
+		)
+	
+	return {
+		"item_prices": item_prices,
+		"insurance_plan": insurance_plan,
+		"price_list": price_list
+	}
+
 
 # END MY CODE

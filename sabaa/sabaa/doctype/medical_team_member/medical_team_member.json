@@ -9,7 +9,12 @@
   "medical_team_member_section",
   "healthcare_practitioner",
   "role",
-  "journal_entry"
+  "fees_section",
+  "fees_item",
+  "fees",
+  "column_break_zred",
+  "journal_entry",
+  "invoiced"
  ],
  "fields": [
   {
@@ -28,7 +33,7 @@
    "in_list_view": 1,
    "in_standard_filter": 1,
    "label": "Role",
-   "options": "Anesthesiologist\nAssistant Doctor\nAssistant Anesthesiologist"
+   "options": "Surgeon\nAnesthesiologist\nAssistant Doctor\nAssistant Anesthesiologist"
   },
   {
    "fieldname": "journal_entry",
@@ -41,12 +46,39 @@
    "fieldname": "medical_team_member_section",
    "fieldtype": "Section Break",
    "label": "Medical Team Member"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "fees_section",
+   "fieldtype": "Section Break",
+   "label": "Fees"
+  },
+  {
+   "fieldname": "fees_item",
+   "fieldtype": "Link",
+   "label": "Fees Item",
+   "options": "Item"
+  },
+  {
+   "fieldname": "fees",
+   "fieldtype": "Float",
+   "label": "Fees"
+  },
+  {
+   "fieldname": "column_break_zred",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "invoiced",
+   "fieldtype": "Check",
+   "label": "Invoiced"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2024-01-08 15:52:22.614842",
+ "modified": "2024-01-09 06:25:55.255750",
  "modified_by": "Administrator",
  "module": "Sabaa",
  "name": "Medical Team Member",
